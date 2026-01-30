@@ -47,6 +47,8 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     private val buttonNameMap = mutableMapOf<ImageView, String>()
 
 
+
+
     private var isLearningComplete : Boolean = false
 
     private var sunJumpAnimator: android.animation.ValueAnimator? = null
@@ -91,6 +93,9 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     }
 
     override fun initView() {
+
+        Admob.getInstance().setTimeCountdownNativeCollab(60000)
+
         binding.idMusic.select()
         // Initialize preference helper
         preferenceHelper = SharePreferenceHelper(this)
@@ -1113,8 +1118,11 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     }
 
     fun initNativeCollab() {
-            loadNativeCollabAds(R.string.native_cl_play, binding.flNativeCollab)
-
+        Admob.getInstance().loadNativeCollapNotBanner(
+            this,
+            getString(R.string.native_cl_play),
+            binding.flNativeCollab
+        )
     }
     override fun initAds() {
         initNativeCollab()

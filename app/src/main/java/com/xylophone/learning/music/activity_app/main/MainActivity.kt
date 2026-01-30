@@ -165,7 +165,6 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
     override fun initAds() {
         initNativeCollab()
         Admob.getInstance().loadInterAll(this, getString(R.string.inter_all))
-        Admob.getInstance().loadNativeAll(this, getString(R.string.native_all))
     }
 
 
