@@ -8,8 +8,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseActivity
 import com.xylophone.learning.music.core.extensions.handleBackLeftToRight
+import com.xylophone.learning.music.core.extensions.loadNativeCollabAds
 import com.xylophone.learning.music.core.extensions.select
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
+import com.xylophone.learning.music.core.extensions.showInterAll
+import com.xylophone.learning.music.core.helper.LanguageHelper
 import com.xylophone.learning.music.databinding.ActivitySuccessBinding
 
 class SuccessActivity : BaseActivity<ActivitySuccessBinding>() {
@@ -58,9 +61,12 @@ class SuccessActivity : BaseActivity<ActivitySuccessBinding>() {
                 val intent = Intent(this@SuccessActivity, PlayActivity::class.java)
                 // Flag để PlayActivity biết đến từ Success → bấm back sẽ về Home
                 intent.putExtra("from_success", true)
-                startActivity(intent)
-                finish()
+                showInterAll {
+                    startActivity(intent)
+                    finish()
+                }
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+
             }
         }
     }
@@ -68,7 +74,6 @@ class SuccessActivity : BaseActivity<ActivitySuccessBinding>() {
     override fun initText() {
         // Text already set in layout
     }
-
     override fun initActionBar() {
         // No action bar for success screen
     }
@@ -81,4 +86,21 @@ class SuccessActivity : BaseActivity<ActivitySuccessBinding>() {
         startActivity(intent)
         finish()
     }
+    override fun initAds() {
+        initNativeCollab()
+    }
+
+
+    fun initNativeCollab() {
+
+        loadNativeCollabAds(R.string.native_cl_success, binding.flNativeCollab)
+
+
+    }
+    override fun onRestart() {
+        super.onRestart()
+
+    }
+
+
 }

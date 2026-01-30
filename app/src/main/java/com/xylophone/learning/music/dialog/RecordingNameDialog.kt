@@ -2,6 +2,7 @@ package com.xylophone.learning.music.dialog
 
 import android.app.Activity
 import android.view.inputmethod.EditorInfo
+import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseDialog
 import com.xylophone.learning.music.core.extensions.gone
@@ -12,6 +13,8 @@ import com.xylophone.learning.music.core.extensions.strings
 import com.xylophone.learning.music.core.helper.RecordingManager
 import com.xylophone.learning.music.data.model.Instrument
 import com.xylophone.learning.music.data.model.Recording
+import androidx.core.content.ContextCompat
+
 import com.xylophone.learning.music.databinding.DialogRecordingNameBinding
 
 /**
@@ -40,6 +43,8 @@ class RecordingNameDialog(
         binding.tvTitle.select()
         context.hideNavigation()
     }
+
+
 
     /**
      * Setup thông tin recording (duration, instrument)

@@ -170,9 +170,18 @@
         android:text="@string/continue_per"
         android:textColor="#80F4FF"
 
-        android:layout_marginBottom="50dp"
         android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/txtPermission"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/native_ads" />
+
+    <FrameLayout
+        android:id="@+id/native_ads"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <include layout="@layout/ads_native_big_btn_bottom_shimmer" />
+
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

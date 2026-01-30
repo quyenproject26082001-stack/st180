@@ -13,7 +13,7 @@
         <LinearLayout
             android:id="@+id/layoutMain"
             android:layout_width="320dp"
-            android:layout_height="176dp"
+            android:layout_height="336dp"
             android:layout_gravity="center"
             android:layout_marginHorizontal="24dp"
             android:background="@drawable/bg_dialog"
@@ -26,11 +26,13 @@
                 android:id="@+id/tvTitle"
                 style="@style/single_marquee"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:fontFamily="@font/chewy_regular"
                 android:gravity="center"
-                android:layout_marginTop="14dp"
-                android:layout_marginHorizontal="60dp"
+                android:paddingHorizontal="24dp"
+                android:background="@drawable/bg_title_dialog"
+                android:layout_marginTop="-1dp"
+                android:layout_marginHorizontal="40dp"
                 android:text="@string/name_the_recording"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
@@ -41,7 +43,7 @@
                 android:id="@+id/etRecordingName"
                 android:layout_width="match_parent"
                 android:layout_height="47dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:fontFamily="@font/chewy_regular"
                 android:gravity="left|center_vertical"
                 android:maxLength="50"
@@ -62,12 +64,21 @@
                 android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
                 android:layout_marginHorizontal="50dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_height="46dp"
                 >
                 <include
                     android:id="@+id/flBottom"
                     layout="@layout/layout_bottom" />
+            </FrameLayout>
+
+            <!--    native_ads-->
+            <FrameLayout
+                android:id="@+id/native_ads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layoutActionBar">
+
+                <include layout="@layout/ads_native_medium_btn_bottom_2_shimmer" />
             </FrameLayout>
 
         </LinearLayout>

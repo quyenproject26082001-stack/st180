@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
+import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseActivity
 import com.xylophone.learning.music.core.extensions.rateApp
@@ -23,6 +24,7 @@ import com.xylophone.learning.music.activity_app.SettingsActivity
 import com.xylophone.learning.music.core.extensions.gone
 import com.xylophone.learning.music.core.extensions.setGradientTextHeightColor
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
+import com.xylophone.learning.music.core.extensions.showInterAll
 import com.xylophone.learning.music.core.extensions.strings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -55,12 +57,16 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
 
             btnPlayHome.setOnSingleClick {
                 Log.d("MainActivity", "btnPlayHome clicked - Opening PlayActivity")
-                startIntentRightToLeft(PlayActivity::class.java)
+                showInterAll {
+                    startIntentRightToLeft(PlayActivity::class.java)
+                }
             }
 
             btnMyRecordHome.setOnSingleClick {
                 Log.d("MainActivity", "btnMyRecordHome clicked - Opening MyRecordActivity")
-                startIntentRightToLeft(MyRecordActivity::class.java)
+                showInterAll {
+                    startIntentRightToLeft(MyRecordActivity::class.java)
+                }
             }
 
 
@@ -97,6 +103,7 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
                             finishAffinity()
                         }
                     }
+
                     RateState.CANCEL -> {
                         lifecycleScope.launch {
                             sharePreference.setCountBack(sharePreference.getCountBack() + 1)
@@ -116,7 +123,8 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
 
     private fun deleteTempFolder() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val dataTemp = MediaHelper.getImageInternal(this@MainActivity, ValueKey.DOWNLOAD_ALBUM_BACKGROUND)
+            val dataTemp =
+                MediaHelper.getImageInternal(this@MainActivity, ValueKey.DOWNLOAD_ALBUM_BACKGROUND)
             if (dataTemp.isNotEmpty()) {
                 dataTemp.forEach {
                     val file = File(it)
@@ -142,5 +150,23 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
         super.onRestart()
         LanguageHelper.setLocale(this)
         updateText()
+        initNativeCollab()
+
     }
+
+    fun initNativeCollab() {
+        Admob.getInstance().loadNativeCollapNotBanner(
+            this,
+            getString(R.string.native_cl_home),
+            binding.flNativeCollab
+        )
+    }
+
+    override fun initAds() {
+        initNativeCollab()
+        Admob.getInstance().loadInterAll(this, getString(R.string.inter_all))
+        Admob.getInstance().loadNativeAll(this, getString(R.string.native_all))
+    }
+
+
 }

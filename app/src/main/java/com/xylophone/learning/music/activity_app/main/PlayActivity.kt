@@ -14,6 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseActivity
 import com.xylophone.learning.music.core.extensions.animateScaleEffect
@@ -21,9 +22,11 @@ import com.xylophone.learning.music.core.extensions.goHome
 import com.xylophone.learning.music.core.extensions.gone
 import com.xylophone.learning.music.core.extensions.handleBackLeftToRight
 import com.xylophone.learning.music.core.extensions.invisible
+import com.xylophone.learning.music.core.extensions.loadNativeCollabAds
 import com.xylophone.learning.music.core.extensions.select
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
 import com.xylophone.learning.music.core.extensions.shakeViewEffect
+import com.xylophone.learning.music.core.extensions.showInterAll
 import com.xylophone.learning.music.core.extensions.visible
 import com.xylophone.learning.music.core.helper.NoteIconManager
 import com.xylophone.learning.music.core.helper.RecordingManager
@@ -98,15 +101,6 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         if(!isLearningMode&&!isPlaybackMode)
         {
             binding.idMusic.setText(R.string.music)
-        }
-        binding.btnHome.setOnSingleClick {
-            if (RecordingManager.isRecording()) {
-                Toast.makeText(this,
-                    getString(R.string.the_recording_was_not_saved), Toast.LENGTH_SHORT).show()
-                goHome()
-            } else {
-                goHome()
-            }
         }
 
         binding.tvRecord.select()
@@ -431,9 +425,9 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             if (RecordingManager.isRecording()) {
                 Toast.makeText(this,
                     getString(R.string.the_recording_was_not_saved), Toast.LENGTH_SHORT).show()
-                goHome()
+                showInterAll { goHome() }
             } else {
-                goHome()
+                showInterAll { goHome() }
             }
         }
 
@@ -627,7 +621,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         // Callback khi user bấm Save
         dialog.onSaveClick = { name ->
             // Lưu recording với tên user đã nhập
-            RecordingManager.savePendingRecording(this, name)
+            showInterAll {   RecordingManager.savePendingRecording(this, name) }
             Toast.makeText(
                 this,
                 getString(R.string.recording_saved, name),
@@ -646,6 +640,12 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         }
 
         dialog.show()
+        Admob.getInstance().loadNativeAd(
+            this,
+            getString(R.string.native_dialog),
+            dialog.binding.nativeAds,
+            R.layout.ads_native_medium_btn_bottom_2_dialog
+        )
     }
 
     // Start timer
@@ -1098,6 +1098,21 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     override fun initActionBar() {
         // PlayActivity không sử dụng action bar layout
     }
+
+    fun initNativeCollab() {
+            loadNativeCollabAds(R.string.native_cl_play, binding.flNativeCollab)
+
+    }
+    override fun initAds() {
+        initNativeCollab()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        initNativeCollab()
+    }
+
+
 
     override fun onBackPressed() {
         if (RecordingManager.isRecording()) {

@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.SwipeToDeleteCallback
 import com.xylophone.learning.music.core.base.BaseActivity
@@ -15,6 +16,7 @@ import com.xylophone.learning.music.core.extensions.setOnSingleClick
 import com.xylophone.learning.music.core.extensions.visible
 import com.xylophone.learning.music.core.extensions.gone
 import com.xylophone.learning.music.core.extensions.invisible
+import com.xylophone.learning.music.core.extensions.showInterAll
 import com.xylophone.learning.music.data.model.Recording
 import com.xylophone.learning.music.core.helper.RecordingManager
 import com.xylophone.learning.music.databinding.ActivityMyRecordBinding
@@ -166,14 +168,14 @@ class MyRecordActivity : BaseActivity<ActivityMyRecordBinding>() {
     override fun viewListener() {
         binding.apply {
             actionBar.btnActionBarLeft.setOnSingleClick {
-                handleBackLeftToRight()
+               showInterAll {   handleBackLeftToRight()}
             }
             actionBar.btnActionBarRight.setOnSingleClick {
                 selectedRecording?.let { recording ->
                     val intent = Intent(this@MyRecordActivity, PlayActivity::class.java)
                     intent.putExtra("mode", "PLAYBACK_MODE")
                     intent.putExtra("recording_id", recording.id)
-                    startActivity(intent)
+                    showInterAll {  startActivity(intent)}
                 }
             }
         }
@@ -198,5 +200,18 @@ class MyRecordActivity : BaseActivity<ActivityMyRecordBinding>() {
         super.onResume()
         // Reload recordings khi quay lại activity
         loadRecordings()
+    }
+
+    fun initNativeCollab() {
+        Admob.getInstance().loadNativeCollapNotBanner(this,getString(R.string.native_cl_myRecord), binding.flNativeCollab)
+    }
+    override fun initAds() {
+        initNativeCollab()
+
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        initNativeCollab()
     }
 }

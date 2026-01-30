@@ -3,12 +3,17 @@ package com.xylophone.learning.music.activity_app.intro
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.LayoutInflater
+import androidx.viewpager2.widget.ViewPager2
+import com.lvt.ads.util.Admob
+import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseActivity
 import com.xylophone.learning.music.core.utils.DataLocal
 import com.xylophone.learning.music.databinding.ActivityIntroBinding
 import com.xylophone.learning.music.activity_app.main.MainActivity
 import com.xylophone.learning.music.activity_app.permission.PermissionActivity
+import com.xylophone.learning.music.core.extensions.gone
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
+import com.xylophone.learning.music.core.extensions.visible
 import kotlin.system.exitProcess
 
 class IntroActivity : BaseActivity<ActivityIntroBinding>() {
@@ -24,6 +29,19 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>() {
 
     override fun viewListener() {
         binding.btnNext.setOnSingleClick { handleNext() }
+
+        binding.vpgTutorial.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                if (position == 1) {
+                    binding.nativeAds.gone()
+                } else {
+                    binding.nativeAds.visible()
+                }
+            }
+        })
+
     }
 
     override fun initText() {}
@@ -54,6 +72,10 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>() {
                 finishAffinity()
             }
         }
+    }
+
+    override fun initAds() {
+        Admob.getInstance().loadNativeAd(this, getString(R.string.native_intro), binding.nativeAds, R.layout.ads_native_medium_btn_bottom)
     }
 
     @SuppressLint("MissingSuperCall", "GestureBackNavigation")

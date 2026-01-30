@@ -117,6 +117,20 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer:1.7.1'
     // UI PlayerView
     implementation 'androidx.media3:media3-ui:1.7.1'
+
+    //ads
+    implementation 'com.github.LVTapp:AdsLibrary:v1.5.5_beta3'
+    implementation 'com.google.android.gms:play-services-ads:24.8.0'
+    implementation 'com.google.ads.mediation:facebook:6.21.0.0'
+    implementation 'com.google.ads.mediation:vungle:7.6.1.0'
+    implementation 'com.google.ads.mediation:applovin:13.5.1.0'
+    implementation 'com.google.ads.mediation:pangle:7.7.0.2.0'
+    implementation 'com.google.ads.mediation:ironsource:9.1.0.0'
+    implementation 'com.unity3d.ads:unity-ads:4.16.4'
+    implementation 'com.google.ads.mediation:unity:4.16.4.0'
+    implementation 'com.google.ads.mediation:mintegral:17.0.31.0'
+
+
     // swiperefreshlayout
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     //firebase

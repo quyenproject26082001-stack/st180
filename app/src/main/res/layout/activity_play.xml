@@ -46,7 +46,7 @@
         app:layout_constraintBottom_toBottomOf="@id/img2"
         app:layout_constraintStart_toEndOf="@id/img2"
         app:layout_constraintTop_toTopOf="@id/img1" />
-    
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btnRecord"
         android:layout_width="96dp"
@@ -76,10 +76,6 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
-
-
     <FrameLayout
         android:id="@+id/btnStop"
         android:layout_width="96dp"
@@ -102,6 +98,7 @@
             />
 
     </FrameLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btnCount"
         android:layout_width="96dp"
@@ -131,7 +128,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btnMusic"
         android:layout_width="0dp"
@@ -155,7 +151,6 @@
             android:layout_marginBottom="2dp"
             android:layout_marginStart="14dp"/>
 
-        
         <TextView
             android:id="@+id/idMusic"
             android:paddingStart="0dp"
@@ -178,132 +173,149 @@
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:id="@+id/frameMusic"
+    <!-- Container chứa frameMusic và tất cả các nút nhạc -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/containerMusic"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:scaleType="fitXY"
         android:layout_marginTop="-20dp"
-        android:src="@drawable/frame_behind"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/img2"/>
+        android:layout_marginBottom="82dp"
+        app:layout_constraintTop_toBottomOf="@id/img2"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <ImageView
-        android:id="@+id/btnDo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.72"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="8dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/btn_do"
-        app:layout_constraintStart_toStartOf="@id/frameMusic"
-        app:layout_constraintEnd_toStartOf="@id/btnRe"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        />
-    <ImageView
-        android:id="@+id/btnRe"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.685"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/btn_re"
-        android:scaleType="fitXY"
-        app:layout_constraintStart_toEndOf="@id/btnDo"
-        app:layout_constraintEnd_toStartOf="@id/btnMi"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        />
-    <ImageView
-        android:id="@+id/btnMi"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.655"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/btn_mi"
-        android:scaleType="fitXY"
-        app:layout_constraintStart_toEndOf="@id/btnRe"
-        app:layout_constraintEnd_toStartOf="@id/btnFa"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        />
+        <ImageView
+            android:id="@+id/frameMusic"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/frame_behind"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <ImageView
+            android:id="@+id/btnDo"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.9"
+            android:layout_marginStart="80dp"
+            android:layout_marginEnd="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/btn_do"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnRe"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            />
 
-    <ImageView
-        android:id="@+id/btnFa"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/btn_fa"
-        android:scaleType="fitXY"
-        app:layout_constraintHeight_percent="0.625"
-        app:layout_constraintStart_toEndOf="@id/btnMi"
-        app:layout_constraintEnd_toStartOf="@id/btnSol"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        />
-    <ImageView
-        android:id="@+id/btnSol"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintHeight_percent="0.595"
-        android:src="@drawable/btn_sol"
-        android:scaleType="fitXY"
-        app:layout_constraintStart_toEndOf="@id/btnFa"
-        app:layout_constraintEnd_toStartOf="@id/btnLa"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        />
-    <ImageView
-        android:id="@+id/btnLa"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/btn_la"
-        android:scaleType="fitXY"
-        app:layout_constraintHeight_percent="0.585"
-        app:layout_constraintStart_toEndOf="@id/btnSol"
-        app:layout_constraintEnd_toStartOf="@id/btnSi"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        />
-    <ImageView
-        android:id="@+id/btnSi"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/btn_si"
-        android:scaleType="fitXY"
-        app:layout_constraintHeight_percent=".568"
-        app:layout_constraintStart_toEndOf="@id/btnLa"
-        app:layout_constraintEnd_toStartOf="@id/btnDo2"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        />
+        <ImageView
+            android:id="@+id/btnRe"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.85"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/btn_re"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toEndOf="@id/btnDo"
+            app:layout_constraintEnd_toStartOf="@id/btnMi"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
 
-    <ImageView
-        android:id="@+id/btnDo2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="80dp"
-        android:src="@drawable/btn_do2"
-        android:scaleType="fitXY"
-        app:layout_constraintHeight_percent=".53"
-        app:layout_constraintStart_toEndOf="@id/btnSi"
-        app:layout_constraintEnd_toEndOf="@id/frameMusic"
-        app:layout_constraintTop_toTopOf="@id/frameMusic"
-        app:layout_constraintBottom_toBottomOf="@id/frameMusic"
-        />
+        <ImageView
+            android:id="@+id/btnMi"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.8"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/btn_mi"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toEndOf="@id/btnRe"
+            app:layout_constraintEnd_toStartOf="@id/btnFa"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/btnFa"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/btn_fa"
+            android:scaleType="fitXY"
+            app:layout_constraintHeight_percent="0.7725"
+            app:layout_constraintStart_toEndOf="@id/btnMi"
+            app:layout_constraintEnd_toStartOf="@id/btnSol"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/btnSol"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintHeight_percent="0.74"
+            android:src="@drawable/btn_sol"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toEndOf="@id/btnFa"
+            app:layout_constraintEnd_toStartOf="@id/btnLa"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/btnLa"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/btn_la"
+            android:scaleType="fitXY"
+            app:layout_constraintHeight_percent="0.7125"
+            app:layout_constraintStart_toEndOf="@id/btnSol"
+            app:layout_constraintEnd_toStartOf="@id/btnSi"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/btnSi"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/btn_si"
+            android:scaleType="fitXY"
+            app:layout_constraintHeight_percent=".67"
+            app:layout_constraintStart_toEndOf="@id/btnLa"
+            app:layout_constraintEnd_toStartOf="@id/btnDo2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/btnDo2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="80dp"
+            android:src="@drawable/btn_do2"
+            android:scaleType="fitXY"
+            app:layout_constraintHeight_percent=".65"
+            app:layout_constraintStart_toEndOf="@id/btnSi"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Musical note overlay container - positioned on top of all buttons -->
     <FrameLayout
@@ -325,6 +337,16 @@
             android:visibility="gone"
             android:elevation="30dp"
             android:scaleType="fitCenter" />
+    </FrameLayout>
+
+    <!--    flNativeCollab-->
+    <FrameLayout
+        android:id="@+id/flNativeCollab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <include layout="@layout/ads_shimmer_collap_native" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

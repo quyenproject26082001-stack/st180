@@ -35,17 +35,27 @@
 
 
 
+            <!--    native_ads-->
+            <FrameLayout
+                android:id="@+id/native_ads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/layoutActionBar">
+
+                <include layout="@layout/ads_native_collap_banner_shimmer" />
+            </FrameLayout>
+
             <!-- RecyclerView for Songs -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewSongs"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layoutActionBar"
+                app:layout_constraintTop_toBottomOf="@id/native_ads"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_weight="1"
-                android:layout_marginTop="-17dp"
+                android:layout_marginTop="7dp"
                 android:clipToPadding="true"
                 android:paddingHorizontal="8dp"
                 tools:itemCount="4"
@@ -94,6 +104,16 @@
                 app:layout_constraintTop_toBottomOf="@id/no_item" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <!--    flNativeCollab-->
+        <FrameLayout
+            android:id="@+id/flNativeCollab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
+        </FrameLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

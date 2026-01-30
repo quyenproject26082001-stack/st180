@@ -38,7 +38,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="33dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="82dp"
         android:fontFamily="@font/roboto_regular"
         android:gravity="center"
         android:text="@string/this_action_can_contain_ads"
@@ -67,4 +67,16 @@
             app:lottie_rawRes="@raw/lottie_splash" />
 
     </FrameLayout>
+
+    <!--    flNativeCollab-->
+    <FrameLayout
+        android:id="@+id/flNativeCollab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <include layout="@layout/ads_shimmer_collap_native" />
+    </FrameLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

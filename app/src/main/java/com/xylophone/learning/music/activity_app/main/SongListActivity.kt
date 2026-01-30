@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseActivity
 import com.xylophone.learning.music.core.custom.text.DoubleStrokeTextView
@@ -16,6 +17,7 @@ import com.xylophone.learning.music.core.extensions.gone
 import com.xylophone.learning.music.core.extensions.handleBackLeftToRight
 import com.xylophone.learning.music.core.extensions.invisible
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
+import com.xylophone.learning.music.core.extensions.showInterAll
 import com.xylophone.learning.music.core.extensions.visible
 import com.xylophone.learning.music.core.helper.RecordingManager
 import com.xylophone.learning.music.data.model.Recording
@@ -177,7 +179,7 @@ class SongListActivity : BaseActivity<ActivitySongListBinding>() {
     override fun viewListener() {
         binding.apply {
             actionBar.btnActionBarLeft.setOnSingleClick {
-                handleBackLeftToRight()
+               showInterAll {   handleBackLeftToRight() }
             }
             actionBar.btnActionBarRight.setOnSingleClick {
                 if(binding.recyclerViewSongs.adapter == songAdapter){
@@ -185,7 +187,7 @@ class SongListActivity : BaseActivity<ActivitySongListBinding>() {
                     val intent = Intent(this@SongListActivity, PlayActivity::class.java)
                     intent.putExtra("mode", "LEARNING_MODE")
                     intent.putExtra("song_id", song.id)
-                    startActivity(intent)
+                   showInterAll {   startActivity(intent) }
                 }
                 }
                 else{
@@ -306,4 +308,22 @@ class SongListActivity : BaseActivity<ActivitySongListBinding>() {
             }
         }
     }
+    override fun initAds() {
+        initNativeCollab()
+        Admob.getInstance().loadNativeAd(
+            this,
+            getString(R.string.native_chooseSound),
+            binding.nativeAds,
+            R.layout.ads_native_banner
+        )
+    }
+
+    fun initNativeCollab() {
+        Admob.getInstance().loadNativeCollapNotBanner(this,getString(R.string.native_cl_chooseSound), binding.flNativeCollab)
+    }
+    override fun onRestart() {
+        super.onRestart()
+        initNativeCollab()
+    }
+
 }

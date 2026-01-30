@@ -1,5 +1,8 @@
 package com.xylophone.learning.music.activity_app.permission
 
+import android.app.Activity
+import android.app.ActivityOptions
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.text.TextUtils
@@ -9,7 +12,11 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.lvt.ads.callback.InterCallback
+import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
+
 import com.xylophone.learning.music.core.base.BaseActivity
 import com.xylophone.learning.music.core.extensions.checkPermissions
 import com.xylophone.learning.music.core.extensions.goToSettings
@@ -26,10 +33,14 @@ import com.xylophone.learning.music.activity_app.main.MainActivity
 import com.xylophone.learning.music.core.extensions.setGradientTextHeightColor
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
 import kotlinx.coroutines.launch
+import kotlin.jvm.java
 
 class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
 
     private val viewModel: PermissionViewModel by viewModels()
+
+    private var inter: InterstitialAd? = null
+
 
     override fun setViewBinding() = ActivityPermissionBinding.inflate(LayoutInflater.from(this))
 
@@ -45,7 +56,11 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
 
     override fun initText() {
         binding.actionBar.tvCenter.select()
-        setGradientTextHeightColor(binding.tvContinue, "#80F4FF".toColorInt(), "#80F4FF".toColorInt())
+        setGradientTextHeightColor(
+            binding.tvContinue,
+            "#80F4FF".toColorInt(),
+            "#80F4FF".toColorInt()
+        )
         val textRes =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) R.string.to_access_13 else R.string.to_access
 
@@ -83,13 +98,15 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
     }
 
     private fun handlePermissionRequest(isStorage: Boolean) {
-        val perms = if (isStorage) viewModel.getStoragePermissions() else viewModel.getNotificationPermissions()
+        val perms =
+            if (isStorage) viewModel.getStoragePermissions() else viewModel.getNotificationPermissions()
         if (checkPermissions(perms)) {
             showToast(if (isStorage) R.string.granted_storage else R.string.granted_notification)
         } else if (viewModel.needGoToSettings(sharePreference, isStorage)) {
             goToSettings()
         } else {
-            val requestCode = if (isStorage) RequestKey.STORAGE_PERMISSION_CODE else RequestKey.NOTIFICATION_PERMISSION_CODE
+            val requestCode =
+                if (isStorage) RequestKey.STORAGE_PERMISSION_CODE else RequestKey.NOTIFICATION_PERMISSION_CODE
             requestPermission(perms, requestCode)
         }
     }
@@ -115,11 +132,18 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val granted = grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        val granted =
+            grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         when (requestCode) {
-            RequestKey.STORAGE_PERMISSION_CODE -> viewModel.updateStorageGranted(sharePreference, granted)
+            RequestKey.STORAGE_PERMISSION_CODE -> viewModel.updateStorageGranted(
+                sharePreference,
+                granted
+            )
 
-            RequestKey.NOTIFICATION_PERMISSION_CODE -> viewModel.updateNotificationGranted(sharePreference, granted)
+            RequestKey.NOTIFICATION_PERMISSION_CODE -> viewModel.updateNotificationGranted(
+                sharePreference,
+                granted
+            )
         }
         if (granted) {
             showToast(if (requestCode == RequestKey.STORAGE_PERMISSION_CODE) R.string.granted_storage else R.string.granted_notification)
@@ -144,6 +168,31 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
         }
     }
 
+
+    fun Activity.startIntentRightToLeft(targetActivity: Class<*>) {
+        val intent = Intent(this, targetActivity)
+        val option =
+            ActivityOptions.makeCustomAnimation(this, R.anim.slide_in_right, R.anim.slide_out_left)
+        startActivity(intent, option.toBundle())
+    }
+
+    override fun initAds() {
+        Admob.getInstance().loadInterAds(
+            this@PermissionActivity, getString(R.string.inter_per), object : InterCallback() {
+                override fun onAdLoadSuccess(interstitialAd: InterstitialAd?) {
+                    super.onAdLoadSuccess(interstitialAd)
+                    inter = interstitialAd
+                }
+            })
+
+        Admob.getInstance().loadNativeAd(
+            this@PermissionActivity,
+            getString(R.string.native_per),
+            binding.nativeAds,
+            R.layout.ads_native_big_btn_top
+        )
+    }
+
     private fun createColoredText(
         @androidx.annotation.StringRes textRes: Int,
         @androidx.annotation.ColorRes colorRes: Int,
@@ -151,8 +200,16 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
     ) = StringHelper.changeColor(this, getString(textRes), colorRes, font)
 
     private fun handleContinue() {
-        sharePreference.setIsFirstPermission(false)
-        startIntentRightToLeft(MainActivity::class.java)
-        finishAffinity()
+        Admob.getInstance().showInterAds(this@PermissionActivity, inter, object : InterCallback() {
+
+            override fun onNextAction() {
+                super.onNextAction()
+                sharePreference.setIsFirstPermission(false)
+                startIntentRightToLeft(MainActivity::class.java)
+                finishAffinity()
+            }
+        }
+        )
+
     }
 }

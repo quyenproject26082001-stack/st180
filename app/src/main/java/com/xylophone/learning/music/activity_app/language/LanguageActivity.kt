@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseActivity
 import com.xylophone.learning.music.core.extensions.handleBackLeftToRight
@@ -139,6 +140,10 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>() {
         } else {
             exitProcess(0)
         }
+    }
+
+    override fun initAds() {
+        Admob.getInstance().loadNativeAd(this@LanguageActivity, getString(R.string.native_language), binding.nativeAds, R.layout.ads_native_big_btn_top)
     }
 
 

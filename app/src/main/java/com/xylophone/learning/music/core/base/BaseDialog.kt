@@ -18,7 +18,7 @@ abstract class BaseDialog<VB : ViewBinding>(
     private val maxHeight: Boolean = false
 ) : Dialog(context) {
 
-    protected lateinit var binding: VB
+    lateinit var binding: VB
     abstract val layoutId: Int
     abstract val isCancelOnTouchOutside: Boolean
     abstract val isCancelableByBack: Boolean
