@@ -512,6 +512,11 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
     // Bắt đầu recording tôi muốn lần đầu vào play thì focus xy
     private fun startRecording() {
+        // Clear playback mode khi bắt đầu recording mới
+        isPlaybackMode = false
+        recordingId = null
+        intent.removeExtra("recording_id")
+
         // Pass instrument hiện tại vào RecordingManager
         RecordingManager.startRecording(currentInstrument.name)
 
@@ -569,6 +574,10 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
         setupRecordingUI()
         isPlaybackMode = false
+
+        // Clear recordingId để không tự động playback lại khi activity recreate
+        recordingId = null
+        intent.removeExtra("recording_id")
 
         // Re-enable instrument switching
         binding.apply {
@@ -772,6 +781,10 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
             setupRecordingUI()
             isPlaybackMode = false
+
+            // Clear recordingId để không tự động playback lại khi activity recreate
+            recordingId = null
+            intent.removeExtra("recording_id")
 
             // RE-ENABLE instrument switching sau khi playback xong
             binding.apply {
