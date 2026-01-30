@@ -1130,6 +1130,8 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
     override fun onRestart() {
         super.onRestart()
+        // Set lại 60000 khi quay lại màn Play (sau cuộc gọi, sau khi ấn Home, etc.)
+        Admob.getInstance().setTimeCountdownNativeCollab(60000)
         initNativeCollab()
     }
 
@@ -1151,6 +1153,12 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Reset về giá trị mặc định khi rời khỏi PlayActivity (chuyển sang màn khác)
+        Admob.getInstance().setTimeCountdownNativeCollab(15000)
     }
 
     override fun onDestroy() {
@@ -1175,6 +1183,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         sunJumpAnimator?.cancel()
         sunJumpAnimator = null
 
+        Admob.getInstance().setTimeCountdownNativeCollab(15000)
         super.onDestroy()
         // SoundHelper sẽ được release khi app đóng
     }
