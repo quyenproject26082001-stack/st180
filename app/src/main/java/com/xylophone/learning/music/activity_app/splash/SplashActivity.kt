@@ -38,7 +38,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
         Admob.getInstance().setTimeCountdownNativeCollab(15000)
 
-        Admob.getInstance().setTimeLimitShowAds(3000)
+        Admob.getInstance().setTimeLimitShowAds(30000)
 
         // Set flag để control ads (true = show ads, false = không show ads)
         val shouldShowAds = true // Đổi thành true nếu muốn show ads

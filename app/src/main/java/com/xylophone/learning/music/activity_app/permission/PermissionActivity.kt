@@ -32,6 +32,9 @@ import com.xylophone.learning.music.databinding.ActivityPermissionBinding
 import com.xylophone.learning.music.activity_app.main.MainActivity
 import com.xylophone.learning.music.core.extensions.setGradientTextHeightColor
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
+import com.xylophone.learning.music.core.extensions.initNetworkMonitor
+import com.xylophone.learning.music.core.utils.DataLocal
+import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.coroutines.launch
 import kotlin.jvm.java
 
@@ -52,6 +55,12 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
             binding.btnNotification.visible()
             binding.btnStorage.gone()
         }
+
+        // Khởi tạo network monitor
+        initNetworkMonitor()
+
+        // Set margin ban đầu dựa trên trạng thái mạng hiện tại
+        updateContinueButtonMargin(DataLocal.isConnectInternet.value)
     }
 
     override fun initText() {
@@ -94,6 +103,11 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
                     updatePermissionUI(granted, false)
                 }
             }
+        }
+
+        // Theo dõi trạng thái mạng để điều chỉnh margin của tvContinue
+        DataLocal.isConnectInternet.observe(this) { isConnected ->
+            updateContinueButtonMargin(isConnected)
         }
     }
 
@@ -211,5 +225,20 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>() {
         }
         )
 
+    }
+
+    private fun updateContinueButtonMargin(isConnected: Boolean?) {
+        val params = binding.tvContinue.layoutParams as ConstraintLayout.LayoutParams
+        val density = resources.displayMetrics.density
+
+        // Nếu không có mạng, set margin bottom = 150dp
+        // Nếu có mạng, margin bottom = 0dp (vì native ads sẽ hiển thị)
+        if (isConnected == false) {
+            params.bottomMargin = (150 * density).toInt()
+        } else {
+            params.bottomMargin = 0
+        }
+
+        binding.tvContinue.layoutParams = params
     }
 }

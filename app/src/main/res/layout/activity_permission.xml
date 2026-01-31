@@ -37,6 +37,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/scvBtn"
         app:layout_constraintTop_toBottomOf="@+id/layoutActionBar" />
 
     <!-- txtPermission -->
@@ -45,9 +46,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="50dp"
         android:gravity="center"
         android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/tvContinue"
+        app:layout_constraintVertical_bias="0.0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/scvBtn">
@@ -66,11 +70,13 @@
     <ScrollView
         android:id="@+id/scvBtn"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="4dp"
+        app:layout_constraintVertical_bias="0.0"
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/txtPermission"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imgPermission">
 
@@ -169,7 +175,7 @@
         android:gravity="center"
         android:text="@string/continue_per"
         android:textColor="#80F4FF"
-
+        app:layout_goneMarginBottom="150dp"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/native_ads" />
