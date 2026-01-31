@@ -635,7 +635,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         // Callback khi user bấm Save
         dialog.onSaveClick = { name ->
             // Lưu recording với tên user đã nhập
-            showInterAll {   RecordingManager.savePendingRecording(this, name) }
+           RecordingManager.savePendingRecording(this, name)
             Toast.makeText(
                 this,
                 getString(R.string.recording_saved, name),
