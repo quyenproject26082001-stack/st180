@@ -10,7 +10,10 @@ enum class Instrument(
 ) {
     PIANO("Piano", "note_", R.drawable.piano_selected, 1.0f),
     XYLOPHONE("Xylophone", "_xylo", R.drawable.xylophone_selected, 1.0f),  // Boost 20%
-    GUITAR("Guitar", "_guitar", R.drawable.guitar_selected, 1.0f);  // Boost 30%
+    GUITAR("Guitar", "_guitar", R.drawable.guitar_selected, 1.0f),
+
+    FLUTE("Flute","flute",R.drawable.flute_selected,1.0f)
+    ;  // Boost 30%
 
     fun getSoundResource(noteName: String): Int {
         return when (this) {
@@ -40,6 +43,21 @@ enum class Instrument(
                     else -> 0
                 }
             }
+
+            FLUTE -> {
+                when(noteName.lowercase()) {
+                    "do" -> R.raw.flute_do
+                    "re" -> R.raw.flute_re
+                    "mi" -> R.raw.flute_mi
+                    "fa" -> R.raw.flute_fa
+                    "sol" -> R.raw.flute_sol
+                    "la" -> R.raw.flute_la
+                    "si" -> R.raw.flute_si
+                    "do2" -> R.raw.flute_do2
+                    else -> 0
+                }
+            }
+
             GUITAR -> {
                 when (noteName.lowercase()) {
                     "do" -> R.raw.do_guitar
@@ -53,6 +71,9 @@ enum class Instrument(
                     else -> 0
                 }
             }
+
+
+
         }
     }
 

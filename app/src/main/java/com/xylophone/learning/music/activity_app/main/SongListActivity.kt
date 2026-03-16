@@ -82,6 +82,7 @@ class SongListActivity : BaseActivity<ActivitySongListBinding>() {
             setupRecyclerView()
             loadSongs()
             setupFilters()
+
             //Toast.makeText(this, "SongListActivity initialized", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(this, "Error in initView: ${e.message}", Toast.LENGTH_LONG).show()

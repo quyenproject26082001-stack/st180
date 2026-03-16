@@ -535,9 +535,11 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img1.isEnabled = false
             img2.isEnabled = false
             img3.isEnabled = false
+            img4.isEnabled = false
             img1.alpha = 0.3f
             img2.alpha = 0.3f
             img3.alpha = 0.3f
+            img4.alpha = 0.3f
         }
 
         startTimer()
@@ -558,6 +560,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img1.isEnabled = true
             img2.isEnabled = true
             img3.isEnabled = true
+            img4.isEnabled = true
             // Restore alpha dựa trên instrument hiện tại
             updateInstrumentUI()
         }
@@ -589,6 +592,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img1.isEnabled = true
             img2.isEnabled = true
             img3.isEnabled = true
+            img4.isEnabled = true
             updateInstrumentUI()
             idMusic.setText(R.string.music)
         }
@@ -614,6 +618,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img1.isEnabled = true
             img2.isEnabled = true
             img3.isEnabled = true
+            img4.isEnabled = true
             updateInstrumentUI()
             idMusic.setText(R.string.music)
         }
@@ -744,9 +749,11 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img1.isEnabled = false
             img2.isEnabled = false
             img3.isEnabled = false
+            img4.isEnabled = false
             img1.alpha = 0.3f
             img2.alpha = 0.3f
             img3.alpha = 0.3f
+            img4.alpha = 0.3f
         }
 
         // Start playback timer để update thời gian liên tục
@@ -796,6 +803,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
                 img1.isEnabled = true
                 img2.isEnabled = true
                 img3.isEnabled = true
+                img4.isEnabled = true
                 updateInstrumentUI()
             }
 
@@ -831,9 +839,11 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
                 img1.isEnabled = false
                 img2.isEnabled = false
                 img3.isEnabled = false
+                img4.isEnabled = false
                 img1.alpha = 0.3f
                 img2.alpha = 0.3f
                 img3.alpha = 0.3f
+                img4.alpha = 0.3f
                 idMusic.text = currentSong?.name?:"Music"
             }
 
@@ -998,6 +1008,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img1.isEnabled = true
             img2.isEnabled = true
             img3.isEnabled = true
+            img4.isEnabled = true
             updateInstrumentUI()
         }
         binding.imgSunGuide.gone()
@@ -1046,6 +1057,10 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img3.setOnSingleClick {
                 switchInstrument(Instrument.GUITAR)
             }
+
+            img4.setOnSingleClick {
+                switchInstrument(Instrument.FLUTE)
+            }
         }
     }
 
@@ -1084,10 +1099,12 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             img1.alpha = 1f
             img2.alpha = 1f
             img3.alpha = 1f
+            img4.alpha = 1f
             // Reset all to unselected state (opacity)
             img1.setImageResource(R.drawable.xylo_unselected)
             img2.setImageResource(R.drawable.piano_unselected)
             img3.setImageResource(R.drawable.guitar_unselected)
+            img4.setImageResource(R.drawable.flute_unselected)
 
             // Highlight selected instrument
             when (currentInstrument) {
@@ -1102,6 +1119,10 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
                 Instrument.GUITAR -> {
                     img3.setImageResource(R.drawable.guitar_selected)
                     img3.alpha = 1.0f
+                }
+                Instrument.FLUTE -> {
+                    img4.setImageResource(R.drawable.flute_selected)
+                    img4.alpha = 1.0f
                 }
             }
         }

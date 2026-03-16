@@ -31,9 +31,13 @@
             <TextView
                 android:clipToOutline="false"
                 android:id="@+id/tvSongName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_marginHorizontal="40dp"
                 android:layout_height="wrap_content"
+                style="@style/single_marquee"
                 android:textSize="20sp"
+
                 android:fontFamily="@font/chewy_regular"
                 android:layout_gravity="center"
                 android:textStyle="bold"

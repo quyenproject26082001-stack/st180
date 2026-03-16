@@ -34,6 +34,7 @@
         android:layout_marginTop="10dp"
         android:src="@drawable/piano_selected"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="102dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -46,6 +47,18 @@
         app:layout_constraintBottom_toBottomOf="@id/img2"
         app:layout_constraintStart_toEndOf="@id/img2"
         app:layout_constraintTop_toTopOf="@id/img1" />
+
+    <ImageView
+        android:id="@+id/img4"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="24dp"
+        android:src="@drawable/flute_selected"
+        app:layout_constraintBottom_toBottomOf="@id/img2"
+        app:layout_constraintStart_toEndOf="@id/img3"
+        app:layout_constraintTop_toTopOf="@id/img1" />
+
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btnRecord"
@@ -137,7 +150,7 @@
         android:layout_width="0dp"
         android:layout_height="44dp"
         android:layout_marginStart="15dp"
-        app:layout_constraintStart_toEndOf="@id/img3"
+        app:layout_constraintStart_toEndOf="@id/img4"
         android:background="@drawable/music_bg"
         app:layout_constraintEnd_toStartOf="@id/btnRecord"
         app:layout_constraintTop_toTopOf="@id/img2"
@@ -312,6 +325,7 @@
         android:layout_height="0dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        tools:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

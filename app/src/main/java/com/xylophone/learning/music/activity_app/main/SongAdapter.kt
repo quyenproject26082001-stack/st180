@@ -27,6 +27,7 @@ class SongAdapter(
         fun bind(song: Song, isSelected: Boolean) {
             binding.apply {
                 tvSongName.text = song.name
+                tvSongName.isSelected = isSelected
 
                 root.setBackgroundResource(
                     if(isSelected) R.drawable.bg_btn_selected
