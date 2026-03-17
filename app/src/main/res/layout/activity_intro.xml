@@ -55,6 +55,7 @@
         android:text="@string/next"
         android:textColor="#80F4FF"
         android:textSize="20sp"
+        android:gravity="center"
         app:layout_constraintBottom_toTopOf="@id/native_ads"
         app:layout_constraintEnd_toEndOf="parent" />
 

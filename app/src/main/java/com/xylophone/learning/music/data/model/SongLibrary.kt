@@ -12,21 +12,21 @@ object SongLibrary {
                 name = "Baby Shark",
                 notes = listOf(
                     // Baby shark doo doo doo (x3)
-                    "Do","Re","Fa","Fa","Fa","Fa","Fa",
-                    "Do","Re","Fa","Fa","Fa","Fa","Fa",
-                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Mi",
+                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa",
+                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa",
+                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Mi",
                     // Baby shark doo doo doo (x3)
-                    "Do","Re","Fa","Fa","Fa","Fa","Fa",
-                    "Do","Re","Fa","Fa","Fa","Fa","Fa",
-                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Mi",
+                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa",
+                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa",
+                    "Do","Re","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Fa","Mi",
                     // Daddy shark (x3)
-                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2",
-                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2",
-                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Si",
-                    // The end!
-                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2",
-                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2",
-                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Si",
+                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2",
+                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2",
+                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Si",
+                    // Daddy shark (x3)
+                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2",
+                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2",
+                    "Fa","Sol","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Do2","Si",
                 ),
                 description = "Most viewed YouTube video ever! 🦈"
             ),
@@ -114,17 +114,14 @@ object SongLibrary {
                 id = "johny_johny",
                 name = "Johny Johny Yes Papa",
                 notes = listOf(
-                    // Johny Johny / Yes Papa / Eating sugar? / No Papa
-                    "Do","Mi","Sol","Sol","Sol","La","Sol",
-                    "Mi","Sol","La","Sol","Sol","Fa","Mi",
-                    // Telling lies? / No Papa / Open your mouth / Ha ha ha
-                    "Mi","Fa","Sol","Sol","Sol","Fa","Mi",
-                    "Do","Re","Mi","Fa","Sol","La","Sol","Mi","Do",
-                    // (verse 2 repeat)
-                    "Do","Mi","Sol","Sol","Sol","La","Sol",
-                    "Mi","Sol","La","Sol","Sol","Fa","Mi",
-                    "Mi","Fa","Sol","Sol","Sol","Fa","Mi",
-                    "Do","Re","Mi","Fa","Sol","La","Sol","Mi","Do"
+                    // Johny Johny Yes Papa
+                    "Do","Do","Sol","Sol","La","La","Sol",
+                    // Eating sugar No Papa
+                    "Fa","Fa","Mi","Mi","Re","Re","Do",
+                    // Telling lies No Papa
+                    "Sol","Sol","Fa","Mi","Mi","Re",
+                    // Open your mouth Ha ha ha
+                    "Sol","Sol","Sol","Fa","Sol","Si","Do"
                 ),
                 description = "Viral nursery rhyme 👦"
             ),
@@ -134,14 +131,14 @@ object SongLibrary {
                 name = "Baa Baa Black Sheep",
                 notes = listOf(
                     // Baa baa black sheep have you any wool
-                    "Do","Do","Sol","Sol","La","La","Sol",
+                    "Do","Do","Sol","Sol","La","La","La","La","Sol",
                     "Fa","Fa","Mi","Mi","Re","Re","Do",
                     // Yes sir yes sir three bags full
-                    "Sol","Sol","Fa","Fa","Mi","Mi","Re",
+                    "Sol","Sol","Sol","Fa","Fa","Mi","Mi","Mi","Re",
                     // One for the master one for the dame
-                    "Sol","Sol","Fa","Fa","Mi","Mi","Re",
+                    "Sol","Sol","Sol","Fa","Fa","Fa","Fa","Mi","Mi","Mi","Re",
                     // One for the little boy who lives down the lane
-                    "Do","Do","Sol","Sol","La","La","Sol",
+                    "Do","Do","Sol","Sol","La","La","La","La","Sol",
                     "Fa","Fa","Mi","Mi","Re","Re","Do"
                 ),
                 description = "Classic nursery rhyme 🐑"
@@ -194,21 +191,6 @@ object SongLibrary {
                 description = "Relaxing boat song 🚣"
             ),
 
-            Song(
-                id = "rain_rain",
-                name = "Rain Rain Go Away",
-                notes = listOf(
-                    // Rain rain go away
-                    "Sol","La","Sol","Fa","Mi",
-                    // Come again another day
-                    "Sol","La","Sol","Fa","Mi","Re",
-                    // Little children want to play
-                    "Mi","Fa","Sol","Sol","La","Sol",
-                    // Rain rain go away
-                    "Sol","La","Sol","Fa","Mi","Do"
-                ),
-                description = "Rainy day song 🌧️"
-            ),
 
             // ==================== MEDIUM (10 bài) ====================
 
@@ -237,14 +219,15 @@ object SongLibrary {
                 id = "if_youre_happy",
                 name = "If You're Happy and You Know It",
                 notes = listOf(
-                    // If you're happy and you know it clap your hands (x2)
-                    "Sol","Sol","Do2","Do2","Do2","Si","La","La","Sol","Sol","Do2",
-                    "Sol","Sol","Do2","Do2","Do2","Si","La","La","Sol","Sol","Do2",
-                    // If you're happy and you know it then your face will surely show it
-                    "Mi","Mi","Fa","Mi","La","Sol",
-                    "Sol","Fa","Mi","Re","Do","Re","Mi","Fa","Sol",
                     // If you're happy and you know it clap your hands
-                    "Sol","Sol","Do2","Do2","Do2","Si","La","La","Sol","Sol","Do2"
+                    "Do","Do","Fa","Fa","Fa","Fa","Fa","Fa","Mi","Fa","Sol",
+                    // (repeat)
+                    "Do","Do","Sol","Sol","Sol","Sol","Sol","Sol","Fa","Sol","La",
+                    // If you're happy and you know it then your face will surely show it
+                    "La","La","Si","Si","Si","Si","Re","Re","Si","Si","La",
+                    "La","La","Sol","Fa","Fa","La","La","Sol","Sol","Sol","Fa","Mi","Mi","Re","Mi","Fa",
+                    // If you're happy and you know it clap your hands
+                    "Do","Do","Fa","Fa","Fa","Fa","Fa","Fa","Mi","Fa","Sol"
                 ),
                 description = "Interactive fun song 👏"
             ),
@@ -268,26 +251,6 @@ object SongLibrary {
                     "Fa","Mi","Re","Do","Re","Mi","Do"
                 ),
                 description = "Counting ducks song 🦆"
-            ),
-
-            Song(
-                id = "itsy_bitsy_spider",
-                name = "Itsy Bitsy Spider",
-                notes = listOf(
-                    // The itsy bitsy spider went up the water spout
-                    "Do","Re","Mi","Do","Mi","Sol",
-                    "Sol","La","Sol","Fa","Mi","Re","Do",
-                    // Down came the rain and washed the spider out
-                    "Sol","La","Do2","Do2",
-                    "Do2","Si","La","Sol","Fa","Mi","Re","Do",
-                    // Out came the sun and dried up all the rain
-                    "Do","Mi","Sol","Do2",
-                    "Do2","Si","La","Sol","Fa","Mi","Re",
-                    // And the itsy bitsy spider went up the spout again
-                    "Do","Re","Mi","Do","Mi","Sol",
-                    "Sol","La","Sol","Fa","Mi","Re","Do"
-                ),
-                description = "Spider climbing song 🕷️"
             ),
 
             Song(
@@ -337,19 +300,17 @@ object SongLibrary {
                 name = "Hickory Dickory Dock",
                 notes = listOf(
                     // Hickory dickory dock
-                    "Mi","Re","Do","Sol","Sol","Sol",
+                    "Mi","Fa","Sol","Fa","Mi","Re","Mi",
                     // The mouse ran up the clock
-                    "Sol","Sol","La","Sol","Sol","Fa","Mi",
+                    "Mi","Mi","Sol","Fa","Re","Mi",
                     // The clock struck one
-                    "Sol","Sol","Sol","Do2","Sol",
+                    "Mi","Mi","Mi","Sol","Fa","Fa",
                     // The mouse ran down
-                    "Sol","Sol","La","Sol","Sol",
+                    "La","Sol","La","Sol","Fa","Mi","Re",
                     // Hickory dickory dock
-                    "Mi","Re","Do","Sol","Sol","Sol",
-                    // Tick tock tick tock
-                    "Sol","Mi","Sol","Mi","Sol","Mi","Do"
+                    "Do","Do"
                 ),
-                description = "Mouse and clock rhyme ⏰"
+                description = "Hickory dickory dock 🕰️"
             ),
 
             Song(
@@ -357,30 +318,17 @@ object SongLibrary {
                 name = "Humpty Dumpty",
                 notes = listOf(
                     // Humpty Dumpty sat on a wall
-                    "Sol","Do2","Do2","Si","La","La","Sol",
+                    "Mi","Sol","Fa","La","Sol","La","Si","Do2",
                     // Humpty Dumpty had a great fall
-                    "Sol","Do2","Do2","Si","La","Sol","Fa","Mi",
+                    "Mi","Sol","Fa","La","Sol","Fa","Mi","Re",
                     // All the king's horses and all the king's men
-                    "Mi","Fa","Sol","Sol","La","Sol","Fa","Mi","Re",
+                    "Mi","Mi","Sol","Fa","Fa","La","Sol","La","Si","Do",
                     // Couldn't put Humpty together again
-                    "Mi","Fa","Sol","Sol","La","Sol","Mi","Do"
+                    "Do","Mi","Mi","Do"
                 ),
                 description = "Classic nursery rhyme 🥚"
-            ),
+            ),// m, s, f, l, s, l, si, do2, mi, sol,fa, la,sol,fa,m,r, m,m,s,f,f,l,s,l,si,do,d,m,m,d
 
-            Song(
-                id = "jack_and_jill",
-                name = "Jack and Jill",
-                notes = listOf(
-                    // Jack and Jill went up the hill to fetch a pail of water
-                    "Sol","Do","Re","Mi","Fa","Sol","Sol","Sol",
-                    "La","Sol","Fa","Mi","Re","Do",
-                    // Jack fell down and broke his crown and Jill came tumbling after
-                    "Sol","La","Sol","Sol","La","Sol","Mi",
-                    "Fa","Mi","Re","Do","Re","Mi","Do"
-                ),
-                description = "Classic nursery rhyme ⛰️"
-            ),
 
             // ==================== HARD (10 bài) ====================
 
@@ -442,18 +390,16 @@ object SongLibrary {
                 id = "when_the_saints",
                 name = "When the Saints Go Marching In",
                 notes = listOf(
-                    // Oh when the saints go marching in (x2)
-                    "Mi","Mi","Mi","Fa","Sol",
-                    "Mi","Mi","Fa","Sol","Mi",
+                    // Oh when the saints
+                    "Do","Mi","Fa","Sol",
+                    // Go marching in
+                    "Do","Mi","Fa","Sol",
                     // Oh Lord I want to be in that number
-                    "Sol","Sol","Fa","Mi","Re","Do","Re",
+                    "Do","Mi","Fa","Sol","Mi","Do","Mi","Re",
+                    "Mi","Mi","Re","Do",
                     // When the saints go marching in
-                    "Mi","Fa","Sol","Fa","Mi","Re","Do",
-                    // (verse 2)
-                    "Mi","Mi","Mi","Fa","Sol",
-                    "Mi","Mi","Fa","Sol","Mi",
-                    "Sol","Sol","Fa","Mi","Re","Do","Re",
-                    "Mi","Fa","Sol","Fa","Mi","Re","Do"
+                    "Do","Mi","Sol","Sol","Sol","Fa","Mi","Fa","Sol",
+                    "Mi","Do","Re","Do"
                 ),
                 description = "Famous gospel march 🎺"
             ),
@@ -462,112 +408,44 @@ object SongLibrary {
                 id = "you_are_sunshine",
                 name = "You Are My Sunshine",
                 notes = listOf(
-                    // You are my sunshine my only sunshine
-                    "Do","Mi","Sol","Sol","Sol","Sol","Fa","Mi","Re",
-                    // You make me happy when skies are grey
-                    "Do","Mi","Sol","Sol","Sol","Mi","Fa","Mi","Re","Do",
-                    // You'll never know dear how much I love you
-                    "Do","Re","Mi","Fa","Sol","La","Sol","Fa","Mi","Re",
-                    // Please don't take my sunshine away
-                    "Do","Mi","Sol","Sol","La","Sol","Fa","Mi","Do"
+                    // Verse 1
+                    "Do","Do","Re","Mi","Mi","Mi","Re","Mi","Do",
+                    "Do","Do","Re","Mi","Fa","La","La","Sol","Fa","Mi","Do",
+                    "Re","Mi","Fa","La","La","Sol","Fa","Mi","Do",
+                    "Do","Re","Mi","Fa","Re","Re","Mi","Do",
+                    // Verse 2
+                    "Do","Do","Re","Mi","Mi","Mi","Re","Mi","Do",
+                    "Do","Do","Re","Mi","Fa","La","La","Sol","Fa","Mi","Do",
+                    "Re","Mi","Fa","La","La","Sol","Fa","Mi","Do",
+                    "Do","Re","Mi","Fa","Re","Re","Mi","Do",
+                    // Verse 3
+                    "Do","Do","Re","Mi","Mi","Mi","Re","Mi","Do",
+                    "Do","Do","Re","Mi","Fa","La","La","Sol","Fa","Mi","Do",
+                    "Re","Mi","Fa","La","La","Sol","Fa","Mi","Do",
+                    "Do","Re","Mi","Fa","Re","Re","Mi","Do"
                 ),
                 description = "Classic sunshine song ☀️"
             ),
 
-            Song(
-                id = "coming_round_mountain",
-                name = "She'll Be Coming Round the Mountain",
-                notes = listOf(
-                    // She'll be coming round the mountain when she comes (x2)
-                    "Do","Sol","Sol","Sol","Sol","La","Sol","Mi","Sol",
-                    "Do2","Si","La","Sol",
-                    "Do","Sol","Sol","Sol","Sol","La","Sol","Mi","Sol",
-                    "Do2","Si","La","Sol",
-                    // She'll be coming round the mountain (x3 lines)
-                    "Do","Sol","Sol","Sol","Sol","La","Sol",
-                    "Sol","La","Sol","Fa","Mi","Re",
-                    "Do","Sol","Sol","Sol","Sol","La","Sol","Mi","Sol",
-                    "Do2","Si","La","Sol"
-                ),
-                description = "Traditional folk song 🏔️"
-            ),
 
             Song(
                 id = "this_old_man",
                 name = "This Old Man (Nick Nack Paddywhack)",
                 notes = listOf(
                     // This old man he played one, he played nick nack on my drum
-                    "Sol","Mi","Sol","Mi","Sol",
-                    "Sol","La","Sol","Fa","Mi","Do",
+                    "Sol","Mi","Sol","Sol","Mi","Sol",
+                    "La","Sol","Fa","Mi","Re","Mi",
                     // With a nick nack paddywhack give a dog a bone
-                    "Do","Re","Mi","Fa","Sol","Sol","La","Sol","Fa","Mi","Re",
+                    "Fa","Mi","Fa","Sol","Do","Do","Do","Do","Do","Re","Mi",
                     // This old man came rolling home
-                    "Sol","La","Sol","Fa","Mi","Re","Do",
+                    "Fa","Sol","Sol","Re","Re","Fa","Mi",
                     // Verse 2: he played two, on my shoe
-                    "Sol","Mi","Sol","Mi","Sol",
-                    "Sol","La","Sol","Fa","Mi","Re",
-                    "Do","Re","Mi","Fa","Sol","Sol","La","Sol","Fa","Mi","Re",
-                    "Sol","La","Sol","Fa","Mi","Re","Do"
+                    "Re","Do"
                 ),
                 description = "Counting rhyme song 👴"
             ),
 
-            Song(
-                id = "five_little_monkeys",
-                name = "Five Little Monkeys Jumping on the Bed",
-                notes = listOf(
-                    // Five little monkeys jumping on the bed
-                    "Mi","Mi","Mi","Mi","Re","Do","Sol","Sol","La","Sol",
-                    // One fell off and bumped his head
-                    "Sol","La","Sol","Fa","Mi","Re","Do",
-                    // Mama called the doctor and the doctor said
-                    "Do","Re","Mi","Fa","Sol","Sol","La","Sol","Fa","Mi",
-                    // No more monkeys jumping on the bed!
-                    "Sol","La","Sol","Fa","Mi","Re","Do",
-                    // Verse 2 (four monkeys)
-                    "Mi","Mi","Mi","Mi","Re","Do","Sol","Sol","La","Sol",
-                    "Sol","La","Sol","Fa","Mi","Re","Do",
-                    "Do","Re","Mi","Fa","Sol","Sol","La","Sol","Fa","Mi",
-                    "Sol","La","Sol","Fa","Mi","Re","Do"
-                ),
-                description = "Bouncy counting song 🐒"
-            ),
 
-            Song(
-                id = "farmer_in_dell",
-                name = "The Farmer in the Dell",
-                notes = listOf(
-                    // The farmer in the dell (x2)
-                    "Do","Do","Re","Mi","Do",
-                    "Do","Do","Re","Mi","Do",
-                    // Hi-ho the derry-o
-                    "Sol","Sol","Fa","Mi","Re","Mi","Fa","Sol",
-                    // The farmer in the dell
-                    "Do","Do","Re","Mi","Do",
-                    // The farmer takes a wife (x2)
-                    "Do","Do","Re","Mi","Do",
-                    "Do","Do","Re","Mi","Do",
-                    "Sol","Sol","Fa","Mi","Re","Mi","Fa","Sol",
-                    "Do","Do","Re","Mi","Do"
-                ),
-                description = "Traditional circle game 🌾"
-            ),
-
-            Song(
-                id = "pat_a_cake",
-                name = "Pat-a-Cake Baker's Man",
-                notes = listOf(
-                    // Pat-a-cake pat-a-cake baker's man
-                    "Do","Mi","Re","Mi","Fa","Sol","Sol","Sol",
-                    // Bake me a cake as fast as you can
-                    "Sol","La","Sol","Fa","Mi","Re","Do",
-                    // Pat it and prick it and mark it with B
-                    "Do","Re","Mi","Fa","Sol","La","Sol","Mi",
-                    // Put it in the oven for baby and me
-                    "Mi","Fa","Sol","Sol","La","Sol","Fa","Mi","Re","Do"
-                ),
-                description = "Classic hand clapping rhyme 👐"
-            )
         )
     }
 

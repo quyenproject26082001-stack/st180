@@ -170,13 +170,14 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="0dp"
         android:fontFamily="@font/chicle_regular"
         android:gravity="center"
         android:text="@string/continue_per"
         android:textColor="#80F4FF"
-        app:layout_goneMarginBottom="150dp"
+        app:layout_goneMarginBottom="170dp"
         android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/native_ads" />
 
