@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity_app.main.MainActivity">
+
+    <!-- Background Image -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/img_bg_app1"/>
+
+    <!-- Action Bar -->
+    <FrameLayout
+        android:id="@+id/layoutActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include
+            android:id="@+id/actionBar"
+            layout="@layout/layout_actionbar" />
+    </FrameLayout>
+
+    <!-- Title Image - Centered -->
+    <ImageView
+        android:id="@+id/titleHome"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-30dp"
+        android:layout_marginHorizontal="25dp"
+        android:src="@drawable/titlehome"
+        app:layout_constraintDimensionRatio="325:119"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutActionBar" />
+
+    <!-- Frame Home -->
+    <ImageView
+        android:id="@+id/frameHome"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/flNativeCollab"
+        app:layout_constraintTop_toBottomOf="@id/titleHome" />
+
+    <!-- ScrollView chứa các button -->
+    <ScrollView
+        android:id="@+id/scrollViewButtons"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="@id/frameHome"
+        app:layout_constraintBottom_toTopOf="@id/flNativeCollab"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Button Play Home -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btnPlayHome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:clipToPadding="true"
+                android:clipChildren="true"
+                android:layout_marginHorizontal="15dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:src="@drawable/img_home_1" />
+
+                <com.xylophone.learning.music.core.custom.text.StrokeGradientTextView
+                    android:id="@+id/tv1"
+                    android:layout_width="0dp"
+                    android:clipToOutline="false"
+                    android:paddingHorizontal="10dp"
+                    android:layout_height="100dp"
+                    app:strokeWidth="5dp"
+                    app:strokeColor="@color/white"
+                    app:gradientStartColor="#FFAA80"
+                    app:gradientEndColor="#E45B17"
+                    app:useGradient="true"
+                    android:fontFamily="@font/chewy_regular"
+                    android:text="@string/play"
+                    android:textSize="40sp"
+                    android:layout_marginStart="30dp"
+                    android:ellipsize="marquee"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/glLeftMoreInstrument"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:singleLine="true"
+                    android:scrollHorizontally="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4"
+                    android:id="@+id/glLeftMoreInstrument" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btnMoreInstrument"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:clipToPadding="true"
+                android:clipChildren="true"
+                android:layout_marginHorizontal="15dp"
+                app:layout_constraintTop_toBottomOf="@id/btnPlayHome"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                >
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:src="@drawable/img_home_3" />
+
+                <com.xylophone.learning.music.core.custom.text.StrokeGradientTextView
+                    android:id="@+id/tv3"
+                    android:layout_width="0dp"
+                    android:clipToOutline="false"
+                    android:paddingHorizontal="10dp"
+                    android:layout_height="match_parent"
+                    app:strokeWidth="5dp"
+                    app:strokeColor="@color/white"
+                    app:gradientStartColor="#FFAA80"
+                    app:gradientEndColor="#E41717"
+                    app:useGradient="true"
+                    android:fontFamily="@font/chewy_regular"
+                    android:text="@string/more_instrument"
+                    android:textSize="40sp"
+                    android:layout_marginStart="0dp"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="@id/glLeft1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4"
+                    android:id="@+id/glLeft1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <!-- Button My Record Home -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btnMyRecordHome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:elevation="4dp"
+                app:strokeColor="@color/transparent"
+                android:clipToOutline="false"
+                android:paddingBottom="82dp"
+                android:layout_marginHorizontal="15dp"
+                app:layout_constraintTop_toBottomOf="@id/btnMoreInstrument"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:src="@drawable/img_home_2" />
+
+                <com.xylophone.learning.music.core.custom.text.StrokeGradientTextView
+                    android:id="@+id/tv2"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:fontFamily="@font/sigmar_regular"
+                    android:text="@string/my_record"
+                    android:textSize="40sp"
+                    android:textStyle="bold"
+                    app:strokeWidth="5dp"
+                    app:strokeColor="@color/white"
+                    app:gradientStartColor="#80FFFF"
+                    app:gradientEndColor="#02369D"
+                    app:useGradient="true"
+                    android:ellipsize="marquee"
+                    app:fontFamily="@font/chewy_regular"
+                    app:layout_constraintStart_toStartOf="@id/glLeft2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:singleLine="true"
+                    android:gravity="center"
+                    android:scrollHorizontally="true"
+                    android:focusable="true"
+                    android:paddingEnd="15dp"
+                    android:focusableInTouchMode="true" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.3"
+                    android:id="@+id/glLeft2" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <!-- Native Ad Container -->
+    <FrameLayout
+        android:id="@+id/flNativeCollab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

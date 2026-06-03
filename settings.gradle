@@ -42,5 +42,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ST180_Xylophone for Learning Music"
+rootProject.name = "ST180_Xylophone_Learning_Music"
 include ':app'

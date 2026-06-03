@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_piano">
+
+    <FrameLayout
+        android:id="@+id/btnBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pianoFrame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingTop="5dp"
+        android:background="@drawable/bg_frame_piano"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="768:272">
+
+        <!-- White keys -->
+        <LinearLayout
+            android:id="@+id/whiteKeys"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="7dp"
+            android:layout_marginHorizontal="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/keyDo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_do_piano" />
+
+            <ImageView
+                android:id="@+id/keyRe"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_re_piano" />
+
+            <ImageView
+                android:id="@+id/keyMi"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_mi_piano" />
+
+            <ImageView
+                android:id="@+id/keyFa"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_fa_piano" />
+
+            <ImageView
+                android:id="@+id/keySol"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_sol_piano" />
+
+            <ImageView
+                android:id="@+id/keyLa"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_la_piano" />
+
+            <ImageView
+                android:id="@+id/keySi"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_si_piano" />
+
+            <ImageView
+                android:id="@+id/keyDo2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_do2_piano" />
+
+        </LinearLayout>
+
+        <!-- Black keys overlay -->
+        <!-- Do# : center at 1/7 ≈ 14.3% of width, key width = 9% -->
+        <ImageView
+            android:id="@+id/keyDoSharp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_black_key"
+            app:layout_constraintHeight_percent="0.55"
+            app:layout_constraintHorizontal_bias="0.08"
+            android:layout_marginTop="9dp"
+            app:layout_constraintEnd_toEndOf="@id/whiteKeys"
+            app:layout_constraintStart_toStartOf="@id/whiteKeys"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.09"
+            />
+
+        <!-- Re# : center at 2/7 ≈ 28.6% -->
+        <ImageView
+            android:id="@+id/keyReSharp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_black_key"
+            app:layout_constraintHeight_percent="0.55"
+            app:layout_constraintHorizontal_bias="0.22"
+            android:layout_marginTop="9dp"
+            app:layout_constraintEnd_toEndOf="@id/whiteKeys"
+            app:layout_constraintStart_toStartOf="@id/whiteKeys"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.09"
+            />
+
+        <!-- Fa# : center at 4/7 ≈ 57.1% (no black key between Mi and Fa) -->
+        <ImageView
+            android:id="@+id/keyFaSharp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_black_key"
+            app:layout_constraintHeight_percent="0.55"
+            app:layout_constraintHorizontal_bias="0.48"
+            android:layout_marginTop="9dp"
+            app:layout_constraintEnd_toEndOf="@id/whiteKeys"
+            app:layout_constraintStart_toStartOf="@id/whiteKeys"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.09"
+            />
+
+        <!-- Sol# : center at 5/7 ≈ 71.4% -->
+        <ImageView
+            android:id="@+id/keySolSharp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_black_key"
+            app:layout_constraintHeight_percent="0.55"
+            app:layout_constraintHorizontal_bias="0.64"
+            android:layout_marginTop="9dp"
+            app:layout_constraintEnd_toEndOf="@id/whiteKeys"
+            app:layout_constraintStart_toStartOf="@id/whiteKeys"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.09" />
+
+        <!-- La# : center at 6/7 ≈ 85.7% -->
+        <ImageView
+            android:id="@+id/keyLaSharp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_black_key"
+            app:layout_constraintHeight_percent="0.55"
+            app:layout_constraintHorizontal_bias="0.78"
+            android:layout_marginTop="9dp"
+            app:layout_constraintEnd_toEndOf="@id/whiteKeys"
+            app:layout_constraintStart_toStartOf="@id/whiteKeys"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.09" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--    flNativeCollab-->
+    <FrameLayout
+        android:id="@+id/flNativeCollab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

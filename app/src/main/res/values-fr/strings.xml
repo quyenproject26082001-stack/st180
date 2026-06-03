@@ -133,4 +133,5 @@
     <string name="the_recording_was_not_saved">L’enregistrement n’a pas été sauvegardé !</string>
     <string name="cannot_switch_instrument_while_recording">Impossible de changer d’instrument pendant l’enregistrement !</string>
     <string name="no_record_here">Aucun enregistrement ici</string>
+    <string name="more_instrument">More \nInstrument</string>
 </resources>

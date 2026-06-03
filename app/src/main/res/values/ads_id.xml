@@ -4,17 +4,20 @@
     <string name="inter_splash" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
     <string name="inter_all" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
     <string name="native_language" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
-    <string name="native_splash" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_intro" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_per" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="inter_per" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
-     <string name="native_dialog" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="native_dialog" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_cl_play" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_cl_home" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_cl_chooseSound" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_chooseSound" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_cl_success" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="native_cl_myRecord" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="native_cl_moreInstrument" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="native_cl_guitar" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="native_cl_piano" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="native_cl_drum" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
     <string name="open_resume" translatable="false">ca-app-pub-3940256099942544/9257395921</string>
     <string name="native_all" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
 </resources>

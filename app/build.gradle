@@ -5,6 +5,78 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 
+
+def env = System.getenv("BUILD_ENV")
+def isProd = env == "production"
+
+println("BUILD_ENV = " + env)
+
+def adKeys = ["app_id",
+              "inter_splash",
+              "inter_all",
+              "native_language",
+              "native_intro",
+              "native_per",
+              "inter_per",
+              "native_dialog",
+              "native_cl_play",
+              "native_cl_home",
+              "native_cl_chooseSound",
+              "native_chooseSound",
+              "native_cl_success",
+              "native_cl_myRecord",
+              "native_cl_moreInstrument",
+              "native_cl_guitar",
+              "native_cl_piano",
+              "native_cl_drum",
+              "open_resume",
+              "native_all",]
+//
+def testAds = [
+        app_id                  : "ca-app-pub-3940256099942544~3347511713",
+        inter_splash            : "ca-app-pub-3940256099942544/1033173712",
+        inter_all               : "ca-app-pub-3940256099942544/1033173712",
+        native_language         : "ca-app-pub-3940256099942544/2247696110",
+        native_intro            : "ca-app-pub-3940256099942544/2247696110",
+        native_per              : "ca-app-pub-3940256099942544/2247696110",
+        inter_per               : "ca-app-pub-3940256099942544/1033173712",
+        native_dialog           : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_play          : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_home          : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_chooseSound   : "ca-app-pub-3940256099942544/2247696110",
+        native_chooseSound      : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_success       : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_myRecord      : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_moreInstrument: "ca-app-pub-3940256099942544/2247696110",
+        native_cl_guitar        : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_piano         : "ca-app-pub-3940256099942544/2247696110",
+        native_cl_drum          : "ca-app-pub-3940256099942544/2247696110",
+        open_resume             : "ca-app-pub-3940256099942544/9257395921",
+        native_all              : "ca-app-pub-3940256099942544/2247696110",]
+
+def realAds = [
+        app_id                  : "ca-app-pub-9384003223514230~9147383117",
+        inter_splash            : "ca-app-pub-9384003223514230/1705622732",
+        inter_all               : "ca-app-pub-9384003223514230/6494140905",
+        native_language         : "ca-app-pub-9384003223514230/8682094622",
+        native_intro            : "ca-app-pub-9384003223514230/5397455731",
+        native_per              : "ca-app-pub-9384003223514230/3493347129",
+        inter_per               : "ca-app-pub-9384003223514230/5433114755",
+        native_dialog           : "ca-app-pub-9384003223514230/3867977565",
+        native_cl_play          : "ca-app-pub-9384003223514230/9803604608",
+        native_cl_home          : "ca-app-pub-9384003223514230/8490522935",
+        native_cl_chooseSound   : "ca-app-pub-9384003223514230/3325826166",
+        native_chooseSound      : "ca-app-pub-9384003223514230/3788860591",
+        native_cl_success       : "ca-app-pub-9384003223514230/2554895893",
+        native_cl_myRecord      : "ca-app-pub-9384003223514230/7177441261",
+        native_cl_moreInstrument: "ca-app-pub-9384003223514230/6392917480",
+        native_cl_guitar        : "ca-app-pub-9384003223514230/5149108258",
+        native_cl_piano         : "ca-app-pub-9384003223514230/3836026586",
+        native_cl_drum          : "ca-app-pub-9384003223514230/1209863241",
+        open_resume             : "ca-app-pub-9384003223514230/2012744493",
+        native_all              : "ca-app-pub-9384003223514230/5864359598",]
+
+
 android {
     namespace 'com.xylophone.learning.music'
     compileSdk 36
@@ -13,20 +85,59 @@ android {
         applicationId "com.xylophone.learning.music"
         minSdk 24
         targetSdk 36
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         def formattedDate = new Date().format('MM.dd.yyyy')
-        archivesBaseName = "XyloPhone v${versionName}_${formattedDate}"
+        archivesBaseName = "ST180_Xylophone_Learning_Music_V${versionName}_${formattedDate}"
+    }
+
+    signingConfigs {
+        release {
+            def keyDir = file('key')
+
+            def keystoreFile = keyDir.listFiles()?.find { it.isFile() }
+
+            if (keystoreFile != null) {
+                storeFile keystoreFile
+                storePassword "lvtapp@123"
+                keyAlias "keystore"
+                keyPassword "lvtapp@123"
+            }
+        }
     }
 
     buildTypes {
+
+        debug {
+            adKeys.each { key ->
+                def value = testAds[key]
+
+                if (value == null) {
+                    throw new GradleException("❌ Missing ads key: " + key)
+                }
+
+                resValue "string", key, value
+            }
+        }
+
+
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+
+            adKeys.each { key ->
+                def value = isProd ? realAds[key] : testAds[key]
+
+                if (value == null) {
+                    throw new GradleException("❌ Missing ads key: " + key)
+                }
+
+                resValue "string", key, value
+            }
         }
     }
     compileOptions {

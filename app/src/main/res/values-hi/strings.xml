@@ -134,4 +134,5 @@
     <string name="the_recording_was_not_saved">रिकॉर्डिंग सेव नहीं हुई!</string>
     <string name="cannot_switch_instrument_while_recording">रिकॉर्डिंग के दौरान वाद्य यंत्र नहीं बदला जा सकता!</string>
     <string name="no_record_here">यहाँ कोई रिकॉर्ड नहीं है</string>
+    <string name="more_instrument">More \nInstrument</string>
 </resources>

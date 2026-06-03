@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:background="@drawable/bg_drum"
+    tools:device="spec:width=1280dp,height=360dp,dpi=240,isRound=false,chinSize=0dp"
+    tools:context=".activity_app.main.DrumPlayActivity">
+
+    <FrameLayout
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:id="@+id/btnBack"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="24dp"
+        android:background="@drawable/ic_back"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideCenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <!-- Container TRÁI -->
+    <FrameLayout
+        android:id="@+id/containerLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_height="300dp"
+        android:translationX="-10dp"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".7">
+
+        <ImageView
+            android:id="@+id/btnLeftSnare"
+            android:layout_width="144dp"
+            android:layout_height="155dp"
+            android:src="@drawable/ic_snare"
+            android:layout_marginStart="68dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="bottom|start"/>
+
+        <ImageView
+            android:id="@+id/btnLeftKick"
+            android:layout_width="168dp"
+            android:layout_height="180dp"
+            android:src="@drawable/ic_kick"
+            android:layout_marginStart="207dp"
+            android:layout_marginBottom="0dp"
+            android:layout_gravity="bottom|start"/>
+
+        <ImageView
+            android:id="@+id/btnLeftHihat"
+            android:layout_width="136dp"
+            android:layout_height="136dp"
+            android:src="@drawable/ic_hihat"
+            android:layout_marginStart="128dp"
+            android:layout_marginBottom="110dp"
+            android:layout_gravity="bottom|start"/>
+
+        <ImageView
+            android:id="@+id/btnLeftCrash"
+            android:layout_width="112dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_crash"
+            android:layout_marginStart="258dp"
+            android:layout_marginBottom="105dp"
+            android:layout_gravity="bottom|start"/>
+    </FrameLayout>
+
+    <!-- Container PHẢI (lật ngang) -->
+    <FrameLayout
+        android:id="@+id/containerRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_height="300dp"
+        android:scaleX="-1"
+        app:layout_constraintStart_toEndOf="@id/guideCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".7">
+
+        <ImageView
+            android:id="@+id/btnRightSnare"
+            android:layout_width="144dp"
+            android:layout_height="155dp"
+            android:src="@drawable/ic_snare"
+            android:layout_marginStart="68dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="bottom|start"/>
+
+        <ImageView
+            android:id="@+id/btnRightKick"
+            android:layout_width="168dp"
+            android:layout_height="180dp"
+            android:src="@drawable/ic_kick_1"
+            android:layout_marginStart="207dp"
+            android:layout_marginBottom="0dp"
+            android:layout_gravity="bottom|start"/>
+
+        <ImageView
+            android:id="@+id/btnRightHihat"
+            android:layout_width="136dp"
+            android:layout_height="136dp"
+            android:src="@drawable/ic_hihat"
+            android:layout_marginStart="128dp"
+            android:layout_marginBottom="110dp"
+            android:layout_gravity="bottom|start"/>
+
+        <ImageView
+            android:id="@+id/btnRightCrash"
+            android:layout_width="112dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_crash"
+            android:layout_marginStart="258dp"
+            android:layout_marginBottom="105dp"
+            android:layout_gravity="bottom|start"/>
+
+    </FrameLayout>
+
+    <!--    flNativeCollab-->
+    <FrameLayout
+        android:id="@+id/flNativeCollab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -127,8 +127,10 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
     private fun loadSounds() {
         // Load các file âm thanh cho instrument hiện tại
-        val noteNames = listOf("Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do2")
-
+        val noteNames = listOf("Do", "Re", "Mi", "Fa",
+            "Sol", "La", "Si", "Do2",
+            "Do#", "Re#", "Fa#",
+            "Sol#", "La#")
         noteNames.forEach { noteName ->
             val resId = currentInstrument.getSoundResource(noteName)
             if (resId != 0) {
@@ -263,6 +265,8 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             buttonSoundMap[btnLa] = currentInstrument.getSoundResource("La")
             buttonSoundMap[btnSi] = currentInstrument.getSoundResource("Si")
             buttonSoundMap[btnDo2] = currentInstrument.getSoundResource("Do2")
+
+
 
             buttonNameMap[btnDo] = "Do"
             buttonNameMap[btnRe] = "Re"

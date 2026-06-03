@@ -27,6 +27,11 @@ enum class Instrument(
                     "la" -> R.raw.samples_piano_a3
                     "si" -> R.raw.samples_piano_b3
                     "do2" -> R.raw.samples_piano_c4
+                    "do#" -> R.raw.samples_piano_cs3   // ← thêm
+                    "re#" -> R.raw.samples_piano_ds3   // ← thêm
+                    "fa#" -> R.raw.samples_piano_fs3   // ← thêm
+                    "sol#"-> R.raw.samples_piano_gs3   // ← thêm
+                    "la#" -> R.raw.samples_piano_as3
                     else -> 0
                 }
             }

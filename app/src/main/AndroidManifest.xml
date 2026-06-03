@@ -4,9 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -23,9 +22,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaseProject"
         tools:replace="android:fullBackupContent">
-
-
-        <!-- Disable AdMob auto-initialization -->
+        <activity
+            android:name=".activity_app.main.DrumPlayActivity"
+            android:screenOrientation="landscape"
+            android:exported="false" />
+        <activity
+            android:name=".activity_app.main.PianoPlayActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".activity_app.main.GuitarPlayActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".activity_app.main.ChooseInstrumentActivity"
+            android:exported="false" /> <!-- Disable AdMob auto-initialization -->
         <provider
             android:name="com.google.android.gms.ads.MobileAdsInitProvider"
             android:authorities="${applicationId}.mobileadsinitprovider"
@@ -80,13 +91,9 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
-
-
-
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/app_id" />
-
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
             android:value="true" />

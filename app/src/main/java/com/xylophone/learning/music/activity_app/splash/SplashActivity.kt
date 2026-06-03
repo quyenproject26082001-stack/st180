@@ -135,7 +135,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     }
 
     fun initNativeCollab() {
-        loadNativeCollabAds(R.string.native_splash, binding.flNativeCollab)
+        //loadNativeCollabAds(R.string.native_splash, binding.flNativeCollab)
     }
 
     override fun initAds() {

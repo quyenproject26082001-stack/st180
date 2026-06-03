@@ -47,8 +47,8 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
     private fun setupTextStroke() {
         // Enable marquee effect for long text
         binding.tv1.isSelected = true
-        binding.tv1.isSelected = true
         binding.tv2.isSelected = true
+        binding.tv3.isSelected = true
     }
 
     override fun viewListener() {
@@ -67,6 +67,9 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
                 showInterAll {
                     startIntentRightToLeft(MyRecordActivity::class.java)
                 }
+            }
+            btnMoreInstrument.setOnSingleClick {
+                startIntentRightToLeft(ChooseInstrumentActivity::class.java)
             }
 
 
@@ -139,7 +142,7 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
 
             tv1.setText(R.string.play)
             tv2.setText(R.string.my_record)
-
+            tv3.setText(R.string.more_instrument)
             // Re-enable marquee after text update
             tv1.isSelected = true
             tv2.isSelected = true
