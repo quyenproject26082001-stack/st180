@@ -1182,6 +1182,28 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
     override fun onStop() {
         super.onStop()
+
+        // Stop recording nếu đang recording (tránh memory leak)
+        if (RecordingManager.isRecording()) {
+            RecordingManager.stopRecording()
+            RecordingManager.discardPendingRecording() // Hủy recording chưa lưu
+            stopTimer() // Stop timer
+        }
+
+        // Stop timer nếu đang chạy
+        stopTimer()
+
+        // Stop playback timer nếu đang chạy
+        stopPlaybackTimer()
+
+        // Hủy tất cả pending runnables để tránh crash khi Activity bị destroy
+        playbackRunnables.forEach { playbackHandler.removeCallbacks(it) }
+        playbackRunnables.clear()
+
+        // Cancel sun animation
+        sunJumpAnimator?.cancel()
+        sunJumpAnimator = null
+
         // Reset về giá trị mặc định khi rời khỏi PlayActivity (chuyển sang màn khác)
         Admob.getInstance().setTimeCountdownNativeCollab(15000)
     }

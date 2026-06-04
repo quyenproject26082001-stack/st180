@@ -3,12 +3,14 @@ package com.xylophone.learning.music.activity_app.main
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lvt.ads.event.AdmobEvent
 import com.lvt.ads.util.Admob
 import com.xylophone.learning.music.R
 import com.xylophone.learning.music.core.base.BaseActivity
@@ -185,6 +187,13 @@ class SongListActivity : BaseActivity<ActivitySongListBinding>() {
             actionBar.btnActionBarRight.setOnSingleClick {
                 if(binding.recyclerViewSongs.adapter == songAdapter){
                 selectedSong?.let { song ->
+
+                    val bundle = Bundle().apply {
+                        putString("song_name", song.name)
+                    }
+                    AdmobEvent.logEvent(this@SongListActivity,
+                        "click_song_item", bundle)
+
                     val intent = Intent(this@SongListActivity, PlayActivity::class.java)
                     intent.putExtra("mode", "LEARNING_MODE")
                     intent.putExtra("song_id", song.id)
@@ -193,6 +202,8 @@ class SongListActivity : BaseActivity<ActivitySongListBinding>() {
                 }
                 else{
                     selectedRecording?.let{ recording ->
+
+
                         val intent =Intent(this@SongListActivity, PlayActivity::class.java)
                         intent.putExtra("mode","PLAYBACK_MODE")
                         intent.putExtra("recording_id",recording.id)
