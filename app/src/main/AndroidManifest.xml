@@ -36,6 +36,7 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".activity_app.main.ChooseInstrumentActivity"
+            android:screenOrientation="portrait"
             android:exported="false" /> <!-- Disable AdMob auto-initialization -->
         <provider
             android:name="com.google.android.gms.ads.MobileAdsInitProvider"

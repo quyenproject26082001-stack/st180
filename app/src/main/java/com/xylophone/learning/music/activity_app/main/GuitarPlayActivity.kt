@@ -91,7 +91,7 @@ class GuitarPlayActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners() {
-        binding.btnBack.setOnClickListener { showInterAll {  handleBackLeftToRight() }}
+        binding.btnBack.setOnClickListener {   handleBackLeftToRight() }
 
         binding.scrollFretboard.setOnTouchListener { _, event ->
             when (event.actionMasked) {

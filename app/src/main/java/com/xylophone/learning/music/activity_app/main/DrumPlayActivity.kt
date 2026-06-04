@@ -42,8 +42,8 @@ class DrumPlayActivity : AppCompatActivity() {
 
     private fun setupTouchListener() {
         binding.btnBack.setOnClickListener {
-           showInterAll {   handleBackLeftToRight()}
-        }
+             handleBackLeftToRight()}
+
 
         binding.root.setOnTouchListener { _, event ->
             val offsetX = event.rawX - event.x

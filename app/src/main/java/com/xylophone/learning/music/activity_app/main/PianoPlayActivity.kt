@@ -92,8 +92,8 @@ class PianoPlayActivity : AppCompatActivity() {
 
     private fun setupTouchListener() {
         binding.btnBack.setOnClickListener {
-            showInterAll {  handleBackLeftToRight()}
-        }
+             handleBackLeftToRight()}
+
 
         val touchListener = { _: android.view.View, event: MotionEvent ->
         when(event.actionMasked) {
