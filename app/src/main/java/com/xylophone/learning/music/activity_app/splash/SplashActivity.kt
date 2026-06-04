@@ -41,7 +41,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         Admob.getInstance().setTimeLimitShowAds(30000)
 
         // Set flag để control ads (true = show ads, false = không show ads)
-        val shouldShowAds = true // Đổi thành true nếu muốn show ads
+        val shouldShowAds = false // Đổi thành true nếu muốn show ads
         Admob.getInstance().setOpenShowAllAds(shouldShowAds)
 
         // Xác định màn hình tiếp theo
