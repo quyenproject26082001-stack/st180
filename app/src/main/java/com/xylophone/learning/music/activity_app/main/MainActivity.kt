@@ -49,6 +49,7 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
         binding.tv1.isSelected = true
         binding.tv2.isSelected = true
         binding.tv3.isSelected = true
+        binding.tvAutumnPiano.isSelected = true
     }
 
     override fun viewListener() {
@@ -70,6 +71,9 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
             }
             btnMoreInstrument.setOnSingleClick {
                 startIntentRightToLeft(ChooseInstrumentActivity::class.java)
+            }
+            btnAutumnPiano.setOnSingleClick {
+                startIntentRightToLeft(AutumnPianoActivity::class.java)
             }
 
 
@@ -143,6 +147,7 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
             tv1.setText(R.string.play)
             tv2.setText(R.string.my_record)
             tv3.setText(R.string.more_instrument)
+            tvAutumnPiano.setText(R.string.autumn_home)
             // Re-enable marquee after text update
             tv1.isSelected = true
             tv2.isSelected = true

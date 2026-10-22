@@ -23,6 +23,10 @@
         android:theme="@style/Theme.BaseProject"
         tools:replace="android:fullBackupContent">
         <activity
+            android:name=".activity_app.main.AutumnPianoActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activity_app.main.DrumPlayActivity"
             android:screenOrientation="landscape"
             android:exported="false" />

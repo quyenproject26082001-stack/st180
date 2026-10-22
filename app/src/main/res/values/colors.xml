@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="autumn_key_active">#E4A36D</color>
+    <color name="autumn_key_hint">#F5E2BD</color>
     <color name="white">#FFFFFFFF</color>
     <color name="splash">#17A0E4</color>
     <color name="transparent">#00FFFFFF</color>

@@ -133,4 +133,21 @@
     <string name="cannot_switch_instrument_while_recording">Cannot switch instrument while recording!</string>
     <string name="no_record_here">No record here</string>
     <string name="more_instrument">More \nInstrument</string>
+    <string name="autumn_home">Lãng Quên Chiều Thu Piano</string>
+    <string name="autumn_back">‹ Back</string>
+    <string name="autumn_title">Lãng Quên Chiều Thu</string>
+    <string name="autumn_subtitle">Piano arrangement • key C • 91 BPM</string>
+    <string name="autumn_open_sheet">Practice sheet PDF</string>
+    <string name="autumn_watch_video">Watch cover</string>
+    <string name="autumn_reference_sheet">Reference score online</string>
+    <string name="autumn_no_pdf_viewer">Install a PDF viewer to open the practice sheet.</string>
+    <string name="autumn_sheet_note">Listen to the new two-hand arrangement below. The practice sheet shows the simplified chord pattern. This is an approximation, not the video’s original audio or exact transcription.</string>
+    <string name="autumn_audio_error">Could not play the piano arrangement.</string>
+    <string name="autumn_section_progress">%1$s • bar %2$d/%3$d</string>
+    <string name="autumn_how_to_play">Play the four notes from left to right, one note per beat. Gold keys show the notes in this bar.</string>
+    <string name="autumn_previous">Previous</string>
+    <string name="autumn_next">Next</string>
+    <string name="autumn_play_pattern">Listen</string>
+    <string name="autumn_stop">Stop</string>
+    <string name="autumn_keyboard">Practice keyboard</string>
 </resources>
