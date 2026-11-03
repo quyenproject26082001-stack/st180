@@ -35,6 +35,13 @@ object SoundHelper {
         }
     }
 
+    fun playSound(resId: Int, volume: Float, playbackRate: Float) {
+        soundMap[resId]?.let { id ->
+            val v = volume.coerceIn(0f, 1f)
+            soundPool.play(id, v, v, 1, 0, playbackRate.coerceIn(.5f, 2f))
+        }
+    }
+
     fun release() {
         soundPool.release()
     }

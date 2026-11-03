@@ -72,6 +72,16 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
             btnMoreInstrument.setOnSingleClick {
                 startIntentRightToLeft(ChooseInstrumentActivity::class.java)
             }
+            btnNoiNayPiano.setOnSingleClick {
+                startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java).putExtra("piano_song","noi_nay"))
+            }
+            btnNoiNayAdvanced.setOnSingleClick {
+                startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java).putExtra("piano_song","noi_nay_advanced"))
+            }
+            btnFreePiano.setOnSingleClick { startIntentRightToLeft(FreePianoActivity::class.java) }
+            btnAutumnPhoto.setOnSingleClick {
+                startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java).putExtra("piano_song", "autumn_photo"))
+            }
             btnAutumnPiano.setOnSingleClick {
                 startIntentRightToLeft(AutumnPianoActivity::class.java)
             }

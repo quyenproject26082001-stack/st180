@@ -14,7 +14,7 @@ class App : AdsApplication() {
     }
 
     override fun enableAdsResume(): Boolean {
-        return true
+        return false
     }
 
     override fun getListTestDeviceId(): MutableList<String>? {
@@ -28,4 +28,5 @@ class App : AdsApplication() {
     override fun buildDebug(): Boolean {
         return true
     }
+
 }

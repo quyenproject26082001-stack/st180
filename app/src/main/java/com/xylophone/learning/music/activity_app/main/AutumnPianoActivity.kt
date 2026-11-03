@@ -36,48 +36,36 @@ class AutumnPianoActivity : AppCompatActivity() {
     private data class Measure(val section: String, val chord: String, val notes: List<Int>)
 
     // Indexes follow the C3-C4 keyboard below. Each measure is one four-beat arpeggio.
-    private val measures = listOf(
-        Measure("Intro", "C", listOf(0, 2, 4, 7)),
-        Measure("Intro", "G/B", listOf(6, 1, 4, 6)),
-        Measure("Intro", "Am", listOf(5, 0, 2, 5)),
-        Measure("Intro", "F", listOf(3, 5, 0, 3)),
-        Measure("Intro", "C", listOf(0, 2, 4, 7)),
-        Measure("Intro", "G/B", listOf(6, 1, 4, 6)),
-        Measure("Intro", "Am", listOf(5, 0, 2, 5)),
-        Measure("Intro", "G", listOf(4, 6, 1, 4)),
-        Measure("Verse", "C", listOf(0, 2, 4, 7)),
-        Measure("Verse", "Em", listOf(2, 4, 6, 2)),
-        Measure("Verse", "Am", listOf(5, 0, 2, 5)),
-        Measure("Verse", "Em", listOf(2, 4, 6, 2)),
-        Measure("Verse", "F", listOf(3, 5, 0, 3)),
-        Measure("Verse", "Em", listOf(2, 4, 6, 2)),
-        Measure("Verse", "Dm", listOf(1, 3, 5, 1)),
-        Measure("Verse", "G", listOf(4, 6, 1, 4)),
-        Measure("Chorus", "C", listOf(0, 2, 4, 7)),
-        Measure("Chorus", "Em", listOf(2, 4, 6, 2)),
-        Measure("Chorus", "Am", listOf(5, 0, 2, 5)),
-        Measure("Chorus", "Em", listOf(2, 4, 6, 2)),
-        Measure("Chorus", "F", listOf(3, 5, 0, 3)),
-        Measure("Chorus", "C", listOf(0, 2, 4, 7)),
-        Measure("Chorus", "Dm", listOf(1, 3, 5, 1)),
-        Measure("Chorus", "G", listOf(4, 6, 1, 4)),
-        Measure("Chorus", "C", listOf(0, 2, 4, 7)),
-        Measure("Chorus", "Em", listOf(2, 4, 6, 2)),
-        Measure("Chorus", "Am", listOf(5, 0, 2, 5)),
-        Measure("Chorus", "Em", listOf(2, 4, 6, 2)),
-        Measure("Chorus", "F", listOf(3, 5, 0, 3)),
-        Measure("Chorus", "C", listOf(0, 2, 4, 7)),
-        Measure("Chorus", "Dm", listOf(1, 3, 5, 1)),
-        Measure("Chorus", "G", listOf(4, 6, 1, 4))
-    )
-
+    private val measures = buildList {
+        // The score has a two-beat pickup, a first/second ending, then bars 19–42.
+        add(Measure("Pickup", "Fa trưởng", listOf(0, 2, 3, 4)))
+        repeat(18) { add(Measure(if (it < 8) "Mở đầu" else "Đoạn A", "Fa trưởng", listOf(0, 2, 3, 4))) }
+        repeat(6) { add(Measure("Lặp lại", "Fa trưởng", listOf(0, 2, 3, 4))) }
+        repeat(24) { add(Measure(if (it < 16) "Đoạn B" else "Kết", "Fa trưởng", listOf(0, 2, 3, 4))) }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAutumnPianoBinding.inflate(layoutInflater)
         setContentView(binding.root)
         noteSounds.forEach { if (!SoundHelper.isSoundNotNull(it)) SoundHelper.loadSound(this, it) }
+        binding.playKeyboard.apply {
+            samplesForKeyboard().forEach { if (!SoundHelper.isSoundNotNull(it)) SoundHelper.loadSound(this@AutumnPianoActivity, it) }
+            onNote = { binding.tvNotes.text = it }
+        }
+        binding.btnSustain.setOnClickListener {
+            binding.playKeyboard.sustain = !binding.playKeyboard.sustain
+            binding.btnSustain.setText(if (binding.playKeyboard.sustain) R.string.autumn_sustain_on else R.string.autumn_sustain_off)
+        }
+        binding.btnFallingNotes.setOnClickListener { startActivity(Intent(this, FallingPianoActivity::class.java)) }
         binding.btnBack.setOnClickListener { finish() }
         binding.btnSheet.setOnClickListener { openPracticeSheet() }
+        binding.tvPracticeGuide.setOnLongClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Grand piano • Nguồn và giấy phép")
+                .setMessage(assets.open("GRAND_PIANO_LICENSE.txt").bufferedReader().use { it.readText() })
+                .setPositiveButton(android.R.string.ok,null).show()
+            true
+        }
         binding.btnReferenceSheet.setOnClickListener { openUrl(SHEET_URL) }
         binding.btnVideo.setOnClickListener { openUrl(VIDEO_URL) }
         binding.btnPrevious.setOnClickListener { stopPlayback(); showMeasure((measureIndex - 1 + measures.size) % measures.size) }
@@ -85,6 +73,7 @@ class AutumnPianoActivity : AppCompatActivity() {
         binding.btnPlayPattern.setOnClickListener {
             if (isPlaying) stopPlayback() else startPlayback()
         }
+        (binding.keyC.parent.parent as android.view.View).visibility = android.view.View.GONE
         noteButtons.forEachIndexed { index, button ->
             button.setOnClickListener { SoundHelper.playSound(noteSounds[index]); markNote(index) }
         }
@@ -140,7 +129,7 @@ class AutumnPianoActivity : AppCompatActivity() {
         val player = MediaPlayer()
         try {
             val file = File(cacheDir, ARRANGEMENT_FILE)
-            if (!file.exists()) {
+            run {
                 assets.open(ARRANGEMENT_FILE).use { input ->
                     file.outputStream().use { output -> input.copyTo(output) }
                 }
@@ -193,9 +182,17 @@ class AutumnPianoActivity : AppCompatActivity() {
 
     companion object {
         private const val STATE_MEASURE = "measure"
-        private const val BAR_MS = 2637L // Four beats at 91 BPM
+        private const val BAR_MS = 2400L // Four beats at 100 BPM; ending is intentionally slower
         private const val ARRANGEMENT_FILE = "lang_quen_chieu_thu_arrangement.ogg"
         private const val VIDEO_URL = "https://www.youtube.com/watch?v=rQRMNIoT-KE"
         private const val SHEET_URL = "https://truongca.com/nhac/34354-lang-quen-chieu-thu-piano"
     }
+
+    private fun samplesForKeyboard() = intArrayOf(
+        R.raw.samples_piano_c3, R.raw.samples_piano_cs3, R.raw.samples_piano_d3,
+        R.raw.samples_piano_ds3, R.raw.samples_piano_e3, R.raw.samples_piano_f3,
+        R.raw.samples_piano_fs3, R.raw.samples_piano_g3, R.raw.samples_piano_gs3,
+        R.raw.samples_piano_a3, R.raw.samples_piano_as3, R.raw.samples_piano_b3,
+        R.raw.samples_piano_c4
+    )
 }
