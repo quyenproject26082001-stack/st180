@@ -91,8 +91,8 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
     }
 
     private fun showAutumnChoices() {
-        val labels = arrayOf("Bản nâng cao", "Bản cô Mây", "Bản dễ • Tay trái đơn giản")
-        val ids = arrayOf("autumn", "autumn_photo", "autumn_easy")
+        val labels = arrayOf("Bản nâng cao", "Bản cô Mây", "Bản dễ • Tay trái đơn giản", "Synthesia cô Mây")
+        val ids = arrayOf("autumn", "autumn_photo", "autumn_easy", "co_may_synthesia")
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Lãng Quên Chiều Thu")
             .setItems(labels) { _, which ->

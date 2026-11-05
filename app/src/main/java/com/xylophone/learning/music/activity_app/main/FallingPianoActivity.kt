@@ -39,14 +39,16 @@ class FallingPianoActivity : AppCompatActivity() {
     private lateinit var loopButton: Button
     private lateinit var markers: TextView
     private lateinit var bars: List<Pair<Int, Double>>
+    private var sectionNames=emptyMap<Int,String>()
     private var duration=0.0
     private val pianoSong get()=intent.getStringExtra("piano_song") ?: "autumn"
     private val isPhotoSheet get()=pianoSong=="autumn_photo"
+    private val isCoMaySynthesia get()=pianoSong=="co_may_synthesia"
     private val isEasyAutumn get()=pianoSong=="autumn_easy"
     private val isNoiNay by lazy { pianoSong=="noi_nay" || pianoSong=="noi_nay_advanced" }
     private val isAdvanced by lazy { pianoSong=="noi_nay_advanced" }
-    private val songTitle get()=when(pianoSong) { "autumn_photo" -> "Lãng Quên Chiều Thu • Bản cô Mây • 75 BPM luyện tập"; "autumn_easy" -> "Lãng Quên Chiều Thu • Bản dễ • Tay trái đơn giản"; "noi_nay_advanced" -> "Nơi này có anh • Advanced • Jason Srey • 92 BPM"; "noi_nay" -> "Nơi này có anh • Bản dễ • 75 BPM"; else -> "Lãng Quên Chiều Thu • Bản nâng cao" }
-    private val practicePreferences by lazy { getSharedPreferences(when(pianoSong) { "autumn_photo" -> "autumn_photo_piano_practice"; "noi_nay_advanced" -> "noi_nay_advanced_piano_practice"; "noi_nay" -> "noi_nay_piano_practice"; else -> "autumn_piano_practice" }, MODE_PRIVATE) }
+    private val songTitle get()=when(pianoSong) { "co_may_synthesia" -> "Lãng Quên Chiều Thu • Synthesia cô Mây"; "autumn_photo" -> "Lãng Quên Chiều Thu • Bản cô Mây • 75 BPM luyện tập"; "autumn_easy" -> "Lãng Quên Chiều Thu • Bản dễ • Tay trái đơn giản"; "noi_nay_advanced" -> "Nơi này có anh • Advanced • Jason Srey • 92 BPM"; "noi_nay" -> "Nơi này có anh • Bản dễ • 75 BPM"; else -> "Lãng Quên Chiều Thu • Bản nâng cao" }
+    private val practicePreferences by lazy { getSharedPreferences(when(pianoSong) { "co_may_synthesia" -> "co_may_synthesia_piano_practice"; "autumn_photo" -> "autumn_photo_piano_practice"; "noi_nay_advanced" -> "noi_nay_advanced_piano_practice"; "noi_nay" -> "noi_nay_piano_practice"; else -> "autumn_piano_practice" }, MODE_PRIVATE) }
     private var pointA=0.0
     private var pointB=0.0
     private var looping=false
@@ -70,7 +72,7 @@ class FallingPianoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val json=JSONArray(assets.open(when(pianoSong) { "autumn_photo" -> "autumn_photo_notes.json"; "autumn_easy" -> "autumn_easy_notes.json"; "noi_nay_advanced" -> "noi_nay_advanced_notes.json"; "noi_nay" -> "noi_nay_notes.json"; else -> "autumn_notes.json" }).bufferedReader().use { it.readText() })
+        val json=JSONArray(assets.open(when(pianoSong) { "co_may_synthesia" -> "co_may_synthesia_notes.json"; "autumn_photo" -> "autumn_photo_notes.json"; "autumn_easy" -> "autumn_easy_notes.json"; "noi_nay_advanced" -> "noi_nay_advanced_notes.json"; "noi_nay" -> "noi_nay_notes.json"; else -> "autumn_notes.json" }).bufferedReader().use { it.readText() })
         score=(0 until json.length()).map { i -> json.getJSONObject(i).let {
             val pose=it.optJSONArray("pose")
             PianoLesson.Note(it.getInt("midi"),it.getDouble("start"),it.getDouble("end"),it.getInt("hand"),
@@ -83,8 +85,13 @@ class FallingPianoActivity : AppCompatActivity() {
         pointA=if(validRange) savedA else 0.0
         pointB=if(validRange) savedB else duration
         looping=validRange && practicePreferences.getBoolean("loop_enabled",false)
-        val timeline=JSONArray(assets.open(when(pianoSong) { "autumn_photo" -> "autumn_photo_timeline.json"; "noi_nay_advanced" -> "noi_nay_advanced_timeline.json"; "noi_nay" -> "noi_nay_timeline.json"; else -> "lang_quen_chieu_thu_timeline.json" }).bufferedReader().use { it.readText() })
+        val timeline=JSONArray(assets.open(when(pianoSong) { "co_may_synthesia" -> "co_may_synthesia_timeline.json"; "autumn_photo" -> "autumn_photo_timeline.json"; "noi_nay_advanced" -> "noi_nay_advanced_timeline.json"; "noi_nay" -> "noi_nay_timeline.json"; else -> "lang_quen_chieu_thu_timeline.json" }).bufferedReader().use { it.readText() })
         bars=(0 until timeline.length()).map { timeline.getJSONObject(it).let { row -> row.getInt("bar") to row.getDouble("startMs") } }
+        sectionNames=(0 until timeline.length()).mapNotNull { i ->
+            timeline.getJSONObject(i).let { row ->
+                row.optString("label").takeIf { it.isNotBlank() }?.let { row.getInt("bar") to it }
+            }
+        }.toMap()
         val root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(Color.rgb(19,27,40)); setPadding(8,0,8,0) }
         val controlPanel=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
         root.addView(controlPanel,LinearLayout.LayoutParams(-1,-2))
@@ -110,6 +117,10 @@ class FallingPianoActivity : AppCompatActivity() {
                 if(isPhotoSheet) startActivity(android.content.Intent(this@FallingPianoActivity, AutumnPhotoSheetActivity::class.java))
                 else openNoiNaySheet()
             }
+        })
+        if(isCoMaySynthesia) controlPanel.addView(TextView(this).apply {
+            text="$songTitle\nDạo đầu • Hai lượt verse / điệp khúc • Kết mở rộng"
+            setTextColor(Color.LTGRAY); textSize=12f
         })
         val midiControls=LinearLayout(this)
         midiControls.addView(Button(this).apply {
@@ -155,8 +166,8 @@ class FallingPianoActivity : AppCompatActivity() {
             holdSupport=!holdSupport
             updateStatus()
         }
-        nav("Ô trước") { val i=currentBar(); seekTo(bars[(i-1).coerceAtLeast(0)].second, running) }
-        nav("Ô sau") { val i=currentBar(); seekTo(bars[(i+1).coerceAtMost(bars.lastIndex)].second, running) }
+        nav(if(isCoMaySynthesia) "Đoạn trước" else "Ô trước") { val i=currentBar(); seekTo(bars[(i-1).coerceAtLeast(0)].second, running) }
+        nav(if(isCoMaySynthesia) "Đoạn sau" else "Ô sau") { val i=currentBar(); seekTo(bars[(i+1).coerceAtMost(bars.lastIndex)].second, running) }
         nav("Đặt A") {
             val candidate=bars[currentBar()].second
             if(candidate<pointB) { pointA=candidate; saveLoop(); updateMarkers(); if(looping) seekTo(pointA,running) }
@@ -182,7 +193,7 @@ class FallingPianoActivity : AppCompatActivity() {
             setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
                 override fun onStartTrackingTouch(bar:SeekBar) { dragging=true; resumeAfterSeek=running; pause() }
                 override fun onProgressChanged(bar:SeekBar, progress:Int, fromUser:Boolean) {
-                    if(fromUser) markers.text="Tua đến ${time(progress.toDouble())} • thả tay để chọn ô nhịp"
+                    if(fromUser) markers.text="Tua đến ${time(progress.toDouble())} • " + if(isCoMaySynthesia) "thả tay để chọn đoạn" else "thả tay để chọn ô nhịp"
                 }
                 override fun onStopTrackingTouch(bar:SeekBar) {
                     dragging=false
@@ -253,14 +264,15 @@ class FallingPianoActivity : AppCompatActivity() {
         root.addView(roll,LinearLayout.LayoutParams(-1,0,1f))
         setContentView(root)
         pool=SoundPool.Builder().setMaxStreams(32).setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()).build()
+        val sampleRange=if(isCoMaySynthesia) minOf(28,score.minOf { it.midi })..maxOf(93,score.maxOf { it.midi }) else 28..93
         var loaded=0
         var failed=false
         pool.setOnLoadCompleteListener { _,_,result ->
             if(result!=0) failed=true
             loaded++
-            if(loaded==66) { ready=!failed; play.isEnabled=ready; demo.isEnabled=ready; play.text=if(ready) "▶ Bắt đầu" else "Lỗi âm thanh"; if(::lesson.isInitialized) updateStatus() }
+            if(loaded==sampleRange.count()) { ready=!failed; play.isEnabled=ready; demo.isEnabled=ready; play.text=if(ready) "▶ Bắt đầu" else "Lỗi âm thanh"; if(::lesson.isInitialized) updateStatus() }
         }
-        for(m in 28..93) assets.openFd("piano_keys/$m.wav").use { sounds[m]=pool.load(it,1) }
+        for(m in sampleRange) assets.openFd("piano_keys/$m.wav").use { sounds[m]=pool.load(it,1) }
         roll.onDown=playKey@{ m ->
             if(demonstration) return@playKey
             if(correctOnly && waitMode && !retryChordOnMistake && (!running || countdown>0 || !lesson.accepts(m))) return@playKey
@@ -363,7 +375,9 @@ class FallingPianoActivity : AppCompatActivity() {
     private fun currentBar() = bars.indexOfLast { it.second<=lesson.position.coerceAtLeast(0.0) }.coerceAtLeast(0)
     private fun time(ms:Double):String { val sec=ms.toInt()/1000; return "%d:%02d".format(sec/60,sec%60) }
     private fun updateMarkers() {
-        markers.text="${time(lesson.position.coerceAtLeast(0.0))} / ${time(duration)} • Ô ${bars[currentBar()].first} (lượt ${currentBar()+1}/${bars.size}) • A ${time(pointA)} – B ${time(pointB)} • B: hết ô đang chọn"
+        val location=if(isCoMaySynthesia) "Đoạn ${currentBar()+1}/${bars.size} • ${sectionNames[bars[currentBar()].first].orEmpty()}" else "Ô ${bars[currentBar()].first} (lượt ${currentBar()+1}/${bars.size})"
+        val endLabel=if(isCoMaySynthesia) "B: hết đoạn đang chọn" else "B: hết ô đang chọn"
+        markers.text="${time(lesson.position.coerceAtLeast(0.0))} / ${time(duration)} • $location • A ${time(pointA)} – B ${time(pointB)} • $endLabel"
     }
     private fun seekTo(target:Double, resume:Boolean) {
         pause()

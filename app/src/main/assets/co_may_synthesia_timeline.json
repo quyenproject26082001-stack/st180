@@ -1,0 +1,42 @@
+[
+  {
+    "bar": 1,
+    "startMs": 0,
+    "label": "D\u1ea1o \u0111\u1ea7u"
+  },
+  {
+    "bar": 2,
+    "startMs": 33317,
+    "label": "Verse 1"
+  },
+  {
+    "bar": 3,
+    "startMs": 82567,
+    "label": "Ch\u1ea1y n\u1ed1i 1"
+  },
+  {
+    "bar": 4,
+    "startMs": 85917,
+    "label": "\u0110i\u1ec7p kh\u00fac 1"
+  },
+  {
+    "bar": 5,
+    "startMs": 132917,
+    "label": "Verse 2 \u2022 Qu\u00e3ng t\u00e1m cao"
+  },
+  {
+    "bar": 6,
+    "startMs": 181934,
+    "label": "Ch\u1ea1y n\u1ed1i 2"
+  },
+  {
+    "bar": 7,
+    "startMs": 184917,
+    "label": "\u0110i\u1ec7p kh\u00fac 2"
+  },
+  {
+    "bar": 8,
+    "startMs": 230017,
+    "label": "K\u1ebft m\u1edf r\u1ed9ng"
+  }
+]
