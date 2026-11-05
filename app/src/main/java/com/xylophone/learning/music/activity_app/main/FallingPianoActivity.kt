@@ -42,9 +42,10 @@ class FallingPianoActivity : AppCompatActivity() {
     private var duration=0.0
     private val pianoSong get()=intent.getStringExtra("piano_song") ?: "autumn"
     private val isPhotoSheet get()=pianoSong=="autumn_photo"
+    private val isEasyAutumn get()=pianoSong=="autumn_easy"
     private val isNoiNay by lazy { pianoSong=="noi_nay" || pianoSong=="noi_nay_advanced" }
     private val isAdvanced by lazy { pianoSong=="noi_nay_advanced" }
-    private val songTitle get()=when(pianoSong) { "autumn_photo" -> "Lãng Quên Chiều Thu • Sheet 3 ảnh • 75 BPM luyện tập"; "noi_nay_advanced" -> "Nơi này có anh • Advanced • Jason Srey • 92 BPM"; "noi_nay" -> "Nơi này có anh • Bản dễ • 75 BPM"; else -> "Lãng Quên Chiều Thu" }
+    private val songTitle get()=when(pianoSong) { "autumn_photo" -> "Lãng Quên Chiều Thu • Bản cô Mây • 75 BPM luyện tập"; "autumn_easy" -> "Lãng Quên Chiều Thu • Bản dễ • Tay trái đơn giản"; "noi_nay_advanced" -> "Nơi này có anh • Advanced • Jason Srey • 92 BPM"; "noi_nay" -> "Nơi này có anh • Bản dễ • 75 BPM"; else -> "Lãng Quên Chiều Thu • Bản nâng cao" }
     private val practicePreferences by lazy { getSharedPreferences(when(pianoSong) { "autumn_photo" -> "autumn_photo_piano_practice"; "noi_nay_advanced" -> "noi_nay_advanced_piano_practice"; "noi_nay" -> "noi_nay_piano_practice"; else -> "autumn_piano_practice" }, MODE_PRIVATE) }
     private var pointA=0.0
     private var pointB=0.0
@@ -55,6 +56,7 @@ class FallingPianoActivity : AppCompatActivity() {
     private var hand=0
     private var correctOnly=false
     private var holdSupport=false
+    private var retryChordOnMistake=false
     private lateinit var holdButton: Button
     private lateinit var correctOnlyButton: Button
     private var waitMode=true
@@ -68,9 +70,11 @@ class FallingPianoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val json=JSONArray(assets.open(when(pianoSong) { "autumn_photo" -> "autumn_photo_notes.json"; "noi_nay_advanced" -> "noi_nay_advanced_notes.json"; "noi_nay" -> "noi_nay_notes.json"; else -> "autumn_notes.json" }).bufferedReader().use { it.readText() })
+        val json=JSONArray(assets.open(when(pianoSong) { "autumn_photo" -> "autumn_photo_notes.json"; "autumn_easy" -> "autumn_easy_notes.json"; "noi_nay_advanced" -> "noi_nay_advanced_notes.json"; "noi_nay" -> "noi_nay_notes.json"; else -> "autumn_notes.json" }).bufferedReader().use { it.readText() })
         score=(0 until json.length()).map { i -> json.getJSONObject(i).let {
-            PianoLesson.Note(it.getInt("midi"),it.getDouble("start"),it.getDouble("end"),it.getInt("hand"))
+            val pose=it.optJSONArray("pose")
+            PianoLesson.Note(it.getInt("midi"),it.getDouble("start"),it.getDouble("end"),it.getInt("hand"),
+                it.optInt("finger",0), if(pose==null) emptyList() else (0 until pose.length()).map { i -> pose.getInt(i) })
         }}.sortedBy { it.start }
         duration=score.maxOf { it.end } + 500
         val savedA=practicePreferences.getLong("loop_start_ms",0L).toDouble()
@@ -82,6 +86,8 @@ class FallingPianoActivity : AppCompatActivity() {
         val timeline=JSONArray(assets.open(when(pianoSong) { "autumn_photo" -> "autumn_photo_timeline.json"; "noi_nay_advanced" -> "noi_nay_advanced_timeline.json"; "noi_nay" -> "noi_nay_timeline.json"; else -> "lang_quen_chieu_thu_timeline.json" }).bufferedReader().use { it.readText() })
         bars=(0 until timeline.length()).map { timeline.getJSONObject(it).let { row -> row.getInt("bar") to row.getDouble("startMs") } }
         val root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(Color.rgb(19,27,40)); setPadding(8,0,8,0) }
+        val controlPanel=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
+        root.addView(controlPanel,LinearLayout.LayoutParams(-1,-2))
         val controls=LinearLayout(this)
         fun button(label:String, action:()->Unit):Button = Button(this).apply { text=label; textSize=12f; setOnClickListener { action() }; controls.addView(this,LinearLayout.LayoutParams(0,48.dp,1f)) }
         button("‹ Trở về") { finish() }
@@ -96,9 +102,9 @@ class FallingPianoActivity : AppCompatActivity() {
         play=button("Đang tải…") { if(running) pause() else if(ready) { if(lesson.finished) reset(); running=true; started=true; lastFrame=SystemClock.uptimeMillis(); updateStatus(); handler.post(frame) } }
         play.isEnabled=false
         button("Chơi lại") { reset() }
-        root.addView(controls)
-        if(isNoiNay || isPhotoSheet) root.addView(TextView(this).apply {
-            text="$songTitle • Chạm để xem sheet" + if(isPhotoSheet) "\nChép ảnh thủ công • Tay trái gợi ý hợp âm • Luyến nhỏ giản lược" else ""
+        controlPanel.addView(controls)
+        if(isNoiNay || isPhotoSheet) controlPanel.addView(TextView(this).apply {
+            text="$songTitle • Chạm để xem sheet" + if(isPhotoSheet) "\nTay trái rải theo hướng dẫn cô Mây • Nhịp luyện tập đều" else ""
             setTextColor(Color.LTGRAY); textSize=12f
             setOnClickListener {
                 if(isPhotoSheet) startActivity(android.content.Intent(this@FallingPianoActivity, AutumnPhotoSheetActivity::class.java))
@@ -123,7 +129,7 @@ class FallingPianoActivity : AppCompatActivity() {
                 if(!midiEcho) { midiStreams.values.forEach { fadeOut(it) }; midiStreams.clear() }
             }
         },LinearLayout.LayoutParams(-2,44.dp))
-        root.addView(midiControls)
+        controlPanel.addView(midiControls)
         val navigation=LinearLayout(this)
         fun nav(label:String, action:()->Unit):Button = Button(this).apply {
             text=label; textSize=11f
@@ -138,6 +144,12 @@ class FallingPianoActivity : AppCompatActivity() {
         correctOnlyButton=nav("Chỉ nốt đúng: tắt") {
             correctOnly=!correctOnly
             updateStatus()
+        }
+        lateinit var retryChordButton: Button
+        retryChordButton=nav("Sai hợp âm: tắt") {
+            retryChordOnMistake=!retryChordOnMistake
+            retryChordButton.text=if(retryChordOnMistake) "Sai hợp âm: lặp lại" else "Sai hợp âm: tắt"
+            changeSettings()
         }
         holdButton=nav("Giữ nốt: tắt") {
             holdSupport=!holdSupport
@@ -161,9 +173,9 @@ class FallingPianoActivity : AppCompatActivity() {
             loopButton.text=if(looping) "Lặp: bật" else "Lặp: tắt"
             seekTo(if(looping) pointA else lesson.position.coerceAtLeast(0.0),running)
         }
-        root.addView(navigation)
+        controlPanel.addView(navigation)
         markers=TextView(this).apply { setTextColor(Color.LTGRAY); textSize=11f }
-        root.addView(markers)
+        controlPanel.addView(markers)
         seekBar=SeekBar(this).apply {
             max=duration.toInt()
             contentDescription="Tua vị trí luyện tập"
@@ -179,10 +191,65 @@ class FallingPianoActivity : AppCompatActivity() {
                 }
             })
         }
-        root.addView(seekBar,LinearLayout.LayoutParams(-1,28.dp))
+        controlPanel.addView(seekBar,LinearLayout.LayoutParams(-1,28.dp))
         status=TextView(this).apply { setTextColor(Color.WHITE); textSize=13f; setPadding(6,4,6,4) }
-        root.addView(status)
+        val compactBar=LinearLayout(this).apply { gravity=android.view.Gravity.CENTER_VERTICAL }
+        compactBar.addView(status,LinearLayout.LayoutParams(0,-2,1f))
+        val displayPreferences=getSharedPreferences("piano_display",MODE_PRIVATE)
+        var panelHidden=displayPreferences.getBoolean("controls_hidden",false)
+        val panelToggle=Button(this).apply { textSize=11f; isAllCaps=false }
+        val playControlIndex=controls.indexOfChild(play)
+        val playControlLayout=play.layoutParams
+        val loopControlIndex=navigation.indexOfChild(loopButton)
+        val loopControlLayout=loopButton.layoutParams
+        fun updatePanelVisibility() {
+            val playParent=if(panelHidden) compactBar else controls
+            if(play.parent!==playParent) {
+                (play.parent as? android.view.ViewGroup)?.removeView(play)
+                if(panelHidden) compactBar.addView(play,1,LinearLayout.LayoutParams(-2,48.dp))
+                else controls.addView(play,playControlIndex,playControlLayout)
+            }
+            play.alpha=if(panelHidden) .5f else 1f
+            val loopParent=if(panelHidden) compactBar else navigation
+            if(loopButton.parent!==loopParent) {
+                (loopButton.parent as? android.view.ViewGroup)?.removeView(loopButton)
+                if(panelHidden) compactBar.addView(loopButton,2,LinearLayout.LayoutParams(-2,48.dp))
+                else navigation.addView(loopButton,loopControlIndex,loopControlLayout)
+            }
+            controlPanel.visibility=if(panelHidden) android.view.View.GONE else android.view.View.VISIBLE
+            panelToggle.text=if(panelHidden) "Hiện điều khiển ▾" else "Ẩn điều khiển ▴"
+            panelToggle.contentDescription=if(panelHidden) "Hiện bảng điều khiển piano" else "Ẩn bảng điều khiển để mở rộng piano"
+        }
+        panelToggle.setOnClickListener {
+            panelHidden=!panelHidden
+            displayPreferences.edit().putBoolean("controls_hidden",panelHidden).apply()
+            updatePanelVisibility()
+        }
+        updatePanelVisibility()
+        compactBar.addView(panelToggle,LinearLayout.LayoutParams(-2,48.dp))
+        root.addView(compactBar,LinearLayout.LayoutParams(-1,-2))
         roll=FallingPianoView(this)
+        if(isPhotoSheet || pianoSong=="autumn") {
+            roll.showHandGuide=practicePreferences.getBoolean("hand_guide",true)
+            val guideButton=Button(this).apply {
+                textSize=11f; isAllCaps=false
+                fun refresh() { text=if(roll.showHandGuide) "Tay ảo: bật" else "Tay ảo: tắt" }
+                refresh()
+                setOnClickListener {
+                    roll.showHandGuide=!roll.showHandGuide
+                    practicePreferences.edit().putBoolean("hand_guide",roll.showHandGuide).apply()
+                    refresh()
+                }
+                setOnLongClickListener {
+                    androidx.appcompat.app.AlertDialog.Builder(this@FallingPianoActivity)
+                        .setTitle("Bàn tay ảo • Ngón gợi ý")
+                        .setMessage("1: cái • 2: trỏ • 3: giữa • 4: áp út • 5: út.\n\nTay mờ chuẩn bị ở nốt tiếp theo; đầu ngón sáng khi phím được đánh. Đi theo chuyển động dịch tay, không cố căng tay giữ tất cả phím.\n\nĐây là cách đi ngón gợi ý, chưa được xác nhận bởi giáo viên. Đoạn quá rộng hoặc chưa có thế tay phù hợp sẽ ẩn bàn tay; hãy theo nốt và sheet. MIDI chỉ nhận phím, không nhận biết ngón thật. Chọn Tay trái / Tay phải để tập riêng; Chơi mẫu để xem chuyển động.")
+                        .setPositiveButton("Đã hiểu",null).show()
+                    true
+                }
+            }
+            compactBar.addView(guideButton,LinearLayout.LayoutParams(-2,48.dp))
+        }
         root.addView(roll,LinearLayout.LayoutParams(-1,0,1f))
         setContentView(root)
         pool=SoundPool.Builder().setMaxStreams(32).setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()).build()
@@ -196,7 +263,7 @@ class FallingPianoActivity : AppCompatActivity() {
         for(m in 28..93) assets.openFd("piano_keys/$m.wav").use { sounds[m]=pool.load(it,1) }
         roll.onDown=playKey@{ m ->
             if(demonstration) return@playKey
-            if(correctOnly && waitMode && (!running || countdown>0 || !lesson.accepts(m))) return@playKey
+            if(correctOnly && waitMode && !retryChordOnMistake && (!running || countdown>0 || !lesson.accepts(m))) return@playKey
             if(holdSupport && waitMode && (!running || countdown>0 || !lesson.accepts(m))) return@playKey
             held.add(m)
             streams.remove(m)?.let { fadeOut(it) }
@@ -239,23 +306,16 @@ class FallingPianoActivity : AppCompatActivity() {
     private val Int.dp get()=(this*resources.displayMetrics.density).toInt()
     private fun release(m:Int) { streams.remove(m)?.let { fadeOut(it) } }
     private fun playerVolume(midi:Int):Float {
-        val note=lesson.notes.filter { it.midi==midi }.minByOrNull { kotlin.math.abs(it.start-lesson.position) }
-        return if(note?.hand==1) .40f else .62f
+        // The selected hand must remain clearly audible, including bass-only practice.
+        return 1f
     }
-    // A short attack softens the sample transient without delaying the note onset.
+    // Preserve the piano attack; samples already have headroom for polyphony.
     private fun playSoft(midi:Int, volume:Float, priority:Int):Int {
         val sound=sounds[midi] ?: return 0
-        val initial=volume*.58f
+        val initial=volume.coerceIn(0f,1f)
         val stream=pool.play(sound,initial,initial,priority,0,1f)
         if(stream==0) return 0
         voiceVolumes[stream]=initial
-        for(step in 1..3) envelopes.postAtTime({
-            if(voiceVolumes.containsKey(stream)) {
-                val value=volume*(.58f+.42f*step/3)
-                voiceVolumes[stream]=value
-                pool.setVolume(stream,value,value)
-            }
-        },stream,SystemClock.uptimeMillis()+step*8L)
         // Keep the longer piano decay alive for pedal and soft release.
         envelopes.postAtTime({ voiceVolumes.remove(stream) },stream,SystemClock.uptimeMillis()+6200)
         return stream
@@ -278,7 +338,7 @@ class FallingPianoActivity : AppCompatActivity() {
         val wasStarted=started
         val remainingCountdown=countdown
         pause()
-        lesson=PianoLesson(score.filter { demonstration || hand==2 || it.hand==hand },waitMode,speed,demonstration)
+        lesson=PianoLesson(score.filter { demonstration || hand==2 || it.hand==hand },waitMode,speed,demonstration,retryChordOnMistake)
         roll.lesson=lesson
         roll.configure(lesson.notes)
         seekTo(position,false)
@@ -295,7 +355,7 @@ class FallingPianoActivity : AppCompatActivity() {
     private fun reset() {
         pause()
         accompanied.clear()
-        lesson=PianoLesson(score.filter { demonstration || hand==2 || it.hand==hand },waitMode,speed,demonstration)
+        lesson=PianoLesson(score.filter { demonstration || hand==2 || it.hand==hand },waitMode,speed,demonstration,retryChordOnMistake)
         roll.lesson=lesson; roll.configure(lesson.notes)
         feedback="${if(waitMode) "Đánh phím sáng để tiếp tục" else "Đánh khi nốt chạm vạch vàng"} • Giữ theo độ dài thanh"
         seekTo(if(looping) pointA else 0.0,false)
@@ -385,7 +445,8 @@ class FallingPianoActivity : AppCompatActivity() {
             if(demonstration || hand!=2) score.forEachIndexed { i,n ->
                 if((demonstration || n.hand!=hand) && n.start<lesson.rangeEnd && n.start<=lesson.position && i !in accompanied) {
                     accompanied.add(i)
-                    if(n.end>lesson.position) run { backing[i]=playSoft(n.midi, if(n.hand==0) { if(demonstration) .58f else .36f } else .26f, 0) }
+                    // Demo includes dense chords: reserve mix headroom after sample normalization.
+                    if(n.end>lesson.position) run { backing[i]=playSoft(n.midi, if(demonstration) { if(n.hand==0) .45f else .325f } else .35f, 0) }
                 }
             }
             backing.keys.toList().filter { score[it].end<=lesson.position }.forEach { backing.remove(it)?.let { stream -> fadeOut(stream) } }

@@ -133,9 +133,9 @@
     <string name="cannot_switch_instrument_while_recording">Cannot switch instrument while recording!</string>
     <string name="no_record_here">No record here</string>
     <string name="more_instrument">More \nInstrument</string>
-    <string name="autumn_home">Lãng Quên Chiều Thu Piano</string>
+    <string name="autumn_home">Lãng Quên Chiều Thu • 3 bản piano</string>
     <string name="autumn_back">‹ Back</string>
-    <string name="autumn_title">Lãng Quên Chiều Thu</string>
+    <string name="autumn_title">Lãng Quên Chiều Thu • Bản nâng cao</string>
     <string name="autumn_subtitle">FluidR3 Grand Piano • Fa trưởng • ♩ = 100</string>
     <string name="autumn_open_sheet">Practice sheet PDF</string>
     <string name="autumn_watch_video">Watch cover</string>
@@ -155,7 +155,7 @@
     <string name="autumn_practice_guide">Grand piano: FluidR3 / Frank Wen, CC BY 3.0 US (MIDI.js). Giữ dòng này để xem giấy phép.\nCách dễ nhất: mở sheet, chọn từng ô nhịp bằng Previous/Next, tập tay phải trước rồi ghép tay trái. Có thể giữ nhiều phím cùng lúc để đánh hợp âm; bật Sustain cho các nốt ngân.</string>
     <string name="autumn_falling_notes">Chơi theo nốt rơi</string>
     <string name="free_piano_home">Piano tự do</string>
-    <string name="autumn_photo_home">Lãng Quên Chiều Thu • Bản sheet 3 ảnh\nHọc cảm ứng / đàn thật MIDI</string>
+    <string name="autumn_photo_home">Lãng Quên Chiều Thu • Bản cô Mây\nHọc cảm ứng / đàn thật MIDI</string>
     <string name="noi_nay_piano_home">Nơi này có anh • Piano bản dễ</string>
     <string name="noi_nay_advanced_home">Nơi này có anh • Bản khó</string>
 </resources>

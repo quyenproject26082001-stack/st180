@@ -80,14 +80,25 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
             }
             btnFreePiano.setOnSingleClick { startIntentRightToLeft(FreePianoActivity::class.java) }
             btnAutumnPhoto.setOnSingleClick {
-                startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java).putExtra("piano_song", "autumn_photo"))
+                showAutumnChoices()
             }
             btnAutumnPiano.setOnSingleClick {
-                startIntentRightToLeft(AutumnPianoActivity::class.java)
+                showAutumnChoices()
             }
 
 
         }
+    }
+
+    private fun showAutumnChoices() {
+        val labels = arrayOf("Bản nâng cao", "Bản cô Mây", "Bản dễ • Tay trái đơn giản")
+        val ids = arrayOf("autumn", "autumn_photo", "autumn_easy")
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Lãng Quên Chiều Thu")
+            .setItems(labels) { _, which ->
+                startActivity(android.content.Intent(this, FallingPianoActivity::class.java)
+                    .putExtra("piano_song", ids[which]))
+            }.show()
     }
 
     override fun initText() {

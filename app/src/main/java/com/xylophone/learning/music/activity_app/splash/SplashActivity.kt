@@ -16,6 +16,8 @@ import com.xylophone.learning.music.databinding.ActivitySplashBinding
 import com.xylophone.learning.music.activity_app.intro.IntroActivity
 import com.xylophone.learning.music.activity_app.language.LanguageActivity
 import com.xylophone.learning.music.activity_app.main.DataViewModel
+import com.xylophone.learning.music.activity_app.main.MainActivity
+import com.xylophone.learning.music.core.utils.AppFlowConfig
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -47,8 +49,12 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         // Xác định màn hình tiếp theo
         intentActivity = if (sharePreference.getIsFirstLang()) {
             Intent(this, LanguageActivity::class.java)
-        } else {
+        } else if (AppFlowConfig.SHOW_INTRO) {
             Intent(this, IntroActivity::class.java)
+        } else if (AppFlowConfig.SHOW_PERMISSION && sharePreference.getIsFirstPermission()) {
+            Intent(this, com.xylophone.learning.music.activity_app.permission.PermissionActivity::class.java)
+        } else {
+            Intent(this, MainActivity::class.java)
         }
 
         interCallBack = object : InterCallback() {

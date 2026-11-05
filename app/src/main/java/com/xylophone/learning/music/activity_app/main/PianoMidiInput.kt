@@ -12,6 +12,8 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.provider.Settings
 import android.media.midi.MidiDevice
 import android.media.midi.MidiDeviceInfo
 import android.media.midi.MidiManager
@@ -56,6 +58,9 @@ class PianoMidiInput(
             if (activity.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled == true) showBluetooth()
             else onStatus("Bluetooth chưa bật", device != null)
         }
+    }
+    private val enableLocation = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (active && !disposed) requestBluetooth()
     }
     private val deviceCallback = object : MidiManager.DeviceCallback() {
         override fun onDeviceRemoved(info: MidiDeviceInfo) {
@@ -113,13 +118,28 @@ class PianoMidiInput(
                 enableBluetooth.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
                 return
             }
+            // Android 7–11 requires location services as well as the runtime permission for BLE scans.
+            if (Build.VERSION.SDK_INT < 31) {
+                val location = activity.getSystemService(LocationManager::class.java)
+                val enabled = location != null && (location.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                    location.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                if (!enabled) {
+                    dialog = AlertDialog.Builder(activity).setTitle("Bật Vị trí để tìm đàn")
+                        .setMessage("Android 7–11 cần bật dịch vụ Vị trí để quét Bluetooth MIDI. Ứng dụng không đọc tọa độ của bạn.")
+                        .setPositiveButton("Mở cài đặt") { _, _ -> enableLocation.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
+                        .setNegativeButton("Đóng", null).show()
+                    return
+                }
+            }
             stopScan()
             val devices = mutableListOf<BluetoothDevice>()
             val labels = ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1)
             val list = ListView(activity).apply { this.adapter = labels }
             dialog?.dismiss()
             val scanDialog = AlertDialog.Builder(activity).setTitle("Đang tìm đàn Bluetooth MIDI…")
-                .setView(list).setNegativeButton("Đóng", null).create()
+                .setView(list).setNegativeButton("Đóng", null)
+                .setNeutralButton("Tìm lại") { _, _ -> requestBluetooth() }
+                .setPositiveButton("Hướng dẫn") { _, _ -> showHelp() }.create()
             dialog = scanDialog
             scanDialog.setOnDismissListener { stopScan() }
             list.setOnItemClickListener { _, _, index, _ ->
@@ -179,7 +199,8 @@ class PianoMidiInput(
     }
 
     private fun connectBluetooth(selected: BluetoothDevice) {
-        open("Đàn Bluetooth MIDI", null) { listener -> manager?.openBluetoothDevice(selected, listener, handler) }
+        val label = runCatching { selected.name }.getOrNull() ?: "Đàn Bluetooth MIDI"
+        open(label, null) { listener -> manager?.openBluetoothDevice(selected, listener, handler) }
     }
 
     private fun name(info: MidiDeviceInfo) = info.properties.getString(MidiDeviceInfo.PROPERTY_NAME) ?: "Đàn MIDI ${info.id}"

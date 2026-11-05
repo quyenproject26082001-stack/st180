@@ -7,6 +7,8 @@ import re
 import wave
 import numpy as np
 import soundfile as sf
+from piano.normalize_keys import normalize_pcm
+from piano.advanced_fingering import annotate as annotate_advanced
 from scipy.signal import resample_poly
 from fractions import Fraction
 from piano.score import SCORE, ORDER
@@ -68,10 +70,10 @@ def main():
                 cursor += duration
             assert abs(cursor-beats)<1e-6, (bar,hand,cursor)
         now += beats*beat
-    (ASSETS/'autumn_notes.json').write_text(json.dumps([
+    (ASSETS/'autumn_notes.json').write_text(json.dumps(annotate_advanced([
         dict(midi=midi(e['note']), start=round(e['start']*1000),
              end=round(e['end']*1000), hand=e['hand']) for e in events
-    ], indent=2)+'\n')
+    ]), indent=2)+'\n')
     samples = {}
     raw_dir = ROOT/'docs/piano/grand_source'
     for key in range(28,94):
@@ -110,6 +112,7 @@ def main():
         fade = min(len(sound), int(RATE*.45))
         sound[-fade:] *= np.linspace(1,0,fade)
         sf.write(keys/f'{key}.wav',sound,RATE,subtype='PCM_16')
+        normalize_pcm(keys/f'{key}.wav')
     dry=mix.copy()
     for delay,gain in [(.037,.10),(.061,.08),(.109,.055),(.173,.035),(.257,.02)]:
         offset=round(delay*RATE)

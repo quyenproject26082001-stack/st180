@@ -3,8 +3,11 @@ package com.xylophone.learning.music.activity_app.main
 import kotlin.math.abs
 
 /** Score time is independent of frame rate and freezes at unanswered attacks in wait mode. */
-class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Double, val demonstration: Boolean = false) {
-    data class Note(val midi: Int, val start: Double, val end: Double, val hand: Int)
+class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Double,
+                  val demonstration: Boolean = false,
+                  val retryChordOnMistake: Boolean = false) {
+    data class Note(val midi: Int, val start: Double, val end: Double, val hand: Int,
+                    val finger: Int = 0, val pose: List<Int> = emptyList())
     val results = IntArray(notes.size) // 0 pending, 1 hit, 2 missed
     var position = -2500.0
         private set
@@ -50,6 +53,16 @@ class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Doubl
     }
     fun press(midi: Int): String {
         if (demonstration) return "Đang chơi mẫu"
+        val pendingStart=if(waitMode) notes.indices.filter { results[it]==0 }.minOfOrNull { notes[it].start } else null
+        if (waitMode && retryChordOnMistake && pendingStart != null) {
+            val belongs = notes.indices.any { notes[it].start == pendingStart && notes[it].midi == midi }
+            if (!belongs) {
+                val reset = notes.indices.filter { notes[it].start == pendingStart && results[it] == 1 }
+                reset.forEach { results[it] = 0 }
+                hits -= reset.size
+                return "Sai nÃ³t â€¢ ÄÃ¡nh láº¡i há»£p Ã¢m"
+            }
+        }
         val index = notes.indices.filter { results[it] == 0 && notes[it].midi == midi }
             .minByOrNull { abs(notes[it].start - position) } ?: return "Sai nốt"
         val delta = (position - notes[index].start) / speed

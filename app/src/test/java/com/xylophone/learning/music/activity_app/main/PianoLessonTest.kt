@@ -4,6 +4,16 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PianoLessonTest {
+    @Test fun retryChordResetsPartiallyPlayedChordOnWrongNote() {
+        val lesson=PianoLesson(listOf(note(60),note(64),note(67,600.0)),true,1.0,false,true)
+        lesson.seek(0.0)
+        lesson.advance(0.0)
+        lesson.press(60)
+        lesson.press(61)
+        assertEquals(0, lesson.hits)
+        lesson.press(60); lesson.press(64); lesson.advance(1000.0)
+        assertEquals(600.0, lesson.position, 0.0)
+    }
     private fun note(m:Int,t:Double=0.0)=PianoLesson.Note(m,t,t+500,0)
     @Test fun waitModeRequiresEveryChordNote() {
         val lesson=PianoLesson(listOf(note(60),note(64),note(67,600.0)),true,1.0)

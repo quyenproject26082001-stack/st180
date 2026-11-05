@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Path
+import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
 
@@ -13,6 +15,11 @@ class FallingPianoView(context: Context) : View(context) {
     var lesson: PianoLesson? = null
     var onDown: (Int) -> Unit = {}
     var onUp: (Int) -> Unit = {}
+    var showHandGuide=false
+        set(value) { field=value; guidePoses.clear(); invalidate() }
+    private val guidePoses=mutableMapOf<Int,FloatArray>()
+    private var guideTime=0L
+    private var guidePosition=Double.NaN
     var externalHeldNotes: Set<Int> = emptySet()
         set(value) { field = value; invalidate() }
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -22,7 +29,9 @@ class FallingPianoView(context: Context) : View(context) {
     private fun white(m: Int) = m % 12 !in listOf(1,3,6,8,10)
     fun configure(notes: List<PianoLesson.Note>) {
         releaseKeys()
-        var low = notes.minOf { it.midi }; var high = notes.maxOf { it.midi }
+        guidePoses.clear()
+        val displayed=notes.flatMap { listOf(it.midi)+it.pose }
+        var low = displayed.min(); var high = displayed.max()
         while (!white(low)) low--
         while (!white(high)) high++
         range = low..high; whites = range.filter { white(it) }
@@ -72,6 +81,77 @@ class FallingPianoView(context: Context) : View(context) {
         }
         paint.color=Color.rgb(244,194,93); paint.strokeWidth=4f
         c.drawLine(0f,line,width.toFloat(),line,paint)
+        if(showHandGuide) drawHands(c,model)
+    }
+    private fun drawHands(c: Canvas, model: PianoLesson) {
+        val now=SystemClock.uptimeMillis()
+        val dt=(now-guideTime).coerceIn(0,64).toFloat()
+        guideTime=now
+        if(guidePosition.isNaN() || kotlin.math.abs(model.position-guidePosition)>650) guidePoses.clear()
+        guidePosition=model.position
+        val keyWidth=width.toFloat()/whites.size
+        val keyHeight=height-line
+        val radius=(keyWidth*.22f).coerceAtLeast(4f)
+        var moving=false
+        c.save(); c.clipRect(0f,line,width.toFloat(),height.toFloat())
+        for(hand in 0..1) {
+            val targets=PianoHandGuide.targets(model,hand)
+            if(targets.isEmpty()) { guidePoses.remove(hand); continue }
+            val focus=model.notes[targets.last()]
+            val desired=FloatArray(10)
+            for(f in 0..4) {
+                val r=rect(focus.pose[f])
+                desired[f*2]=r.centerX()
+                desired[f*2+1]=if(white(focus.pose[f])) line+keyHeight*(if(f==0) .67f else .40f) else r.bottom-radius*1.4f
+            }
+            val current=guidePoses.getOrPut(hand) { desired.copyOf() }
+            var distance=0f
+            for(i in current.indices) distance=maxOf(distance,kotlin.math.abs(current[i]-desired[i]))
+            val lifting=distance>keyWidth*.3f
+            for(i in current.indices) {
+                current[i]+=(desired[i]-current[i])*(dt/110f).coerceIn(.01f,1f)
+                if(kotlin.math.abs(current[i]-desired[i])<.3f) current[i]=desired[i] else moving=true
+            }
+            val color=if(hand==0) Color.rgb(80,173,244) else Color.rgb(237,173,86)
+            val center=(current[2]+current[4]+current[6])/3
+            val palmY=line+keyHeight*.83f
+            val half=keyWidth*1.25f
+            paint.style=Paint.Style.FILL; paint.color=color; paint.alpha=75
+            c.drawRoundRect(center-half,palmY-keyHeight*.15f,center+half,palmY+keyHeight*.07f,radius*2,radius*2,paint)
+            c.drawRoundRect(center-half*.55f,palmY,center+half*.55f,height.toFloat()+radius,radius,radius,paint)
+            for(f in 0..4) {
+                val index=targets.firstOrNull { model.notes[it].finger==f+1 }
+                val n=index?.let { model.notes[it] }
+                val pressed=index!=null && n!=null && n.start<=model.position && model.position<n.end &&
+                    ((model.demonstration && model.results[index]==4) ||
+                        (model.results[index]==1 && (n.midi in externalHeldNotes || fingers.containsValue(n.midi))))
+                val x=current[f*2]
+                val y=current[f*2+1] - if(lifting) radius else if(pressed) -radius*.4f else radius*.45f
+                val direction=if(hand==0) 1 else -1
+                val baseX=center+(f-2)*half*.43f*direction
+                val path=Path().apply {
+                    moveTo(baseX,palmY)
+                    cubicTo(baseX,palmY-keyHeight*.1f,x,y+keyHeight*.15f,x,y)
+                }
+                paint.style=Paint.Style.STROKE; paint.strokeCap=Paint.Cap.ROUND
+                paint.strokeWidth=radius*1.8f; paint.color=color; paint.alpha=if(n!=null) 170 else 85
+                c.drawPath(path,paint)
+                paint.style=Paint.Style.FILL
+                paint.color=if(pressed) Color.rgb(81,191,127) else if(n!=null) Color.rgb(244,194,93) else color
+                paint.alpha=if(n!=null) 240 else 145
+                c.drawCircle(x,y,if(pressed) radius*1.15f else radius,paint)
+                paint.color=Color.rgb(19,27,40); paint.alpha=255
+                paint.textAlign=Paint.Align.CENTER; paint.textSize=radius*1.5f
+                c.drawText("${f+1}",x,y-(paint.ascent()+paint.descent())/2,paint)
+            }
+        }
+        c.restore()
+        paint.alpha=255; paint.style=Paint.Style.FILL; paint.textAlign=Paint.Align.LEFT; paint.strokeCap=Paint.Cap.BUTT
+        paint.color=Color.WHITE; paint.textSize=11*resources.displayMetrics.scaledDensity
+        val unassigned=model.notes.any { it.finger==0 && it.start<=model.position && model.position<it.end }
+        c.drawText(if(unassigned) "Đoạn rộng: xem sheet • Tay ảo tạm ẩn ở tay chưa có gợi ý"
+            else "Ngón gợi ý • 1 cái · 2 trỏ · 3 giữa · 4 áp út · 5 út",8f,line-10f,paint)
+        if(moving) postInvalidateOnAnimation()
     }
     private fun key(x:Float,y:Float): Int? {
         if(y<line || y>height || x<0 || x>=width) return null

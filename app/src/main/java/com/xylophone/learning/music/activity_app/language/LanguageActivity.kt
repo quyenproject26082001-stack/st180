@@ -15,8 +15,9 @@ import com.xylophone.learning.music.core.extensions.startIntentWithClearTop
 import com.xylophone.learning.music.core.extensions.visible
 import com.xylophone.learning.music.core.utils.key.IntentKey
 import com.xylophone.learning.music.databinding.ActivityLanguageBinding
-import com.xylophone.learning.music.activity_app.main.MainActivity
 import com.xylophone.learning.music.activity_app.intro.IntroActivity
+import com.xylophone.learning.music.activity_app.main.MainActivity
+import com.xylophone.learning.music.core.utils.AppFlowConfig
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
 import com.xylophone.learning.music.core.extensions.strings
 import com.xylophone.learning.music.ui.language.LanguageViewModel
@@ -125,7 +126,13 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>() {
 
         if (viewModel.isFirstLanguage.value) {
             sharePreference.setIsFirstLang(false)
-            startIntentRightToLeft(IntroActivity::class.java)
+            if (AppFlowConfig.SHOW_INTRO) {
+                startIntentRightToLeft(IntroActivity::class.java)
+            } else if (AppFlowConfig.SHOW_PERMISSION && sharePreference.getIsFirstPermission()) {
+                startIntentRightToLeft(com.xylophone.learning.music.activity_app.permission.PermissionActivity::class.java)
+            } else {
+                startIntentRightToLeft(MainActivity::class.java)
+            }
             finishAffinity()
         } else {
 

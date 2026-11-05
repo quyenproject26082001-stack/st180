@@ -14,6 +14,7 @@ import com.xylophone.learning.music.core.utils.DataLocal
 import com.xylophone.learning.music.databinding.ActivityIntroBinding
 import com.xylophone.learning.music.activity_app.main.MainActivity
 import com.xylophone.learning.music.activity_app.permission.PermissionActivity
+import com.xylophone.learning.music.core.utils.AppFlowConfig
 import com.xylophone.learning.music.core.extensions.gone
 import com.xylophone.learning.music.core.extensions.setOnSingleClick
 import com.xylophone.learning.music.core.extensions.visible
@@ -86,7 +87,7 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>() {
                 vpgTutorial.setCurrentItem(nextItem, true)
             } else {
                 val intent =
-                    if (sharePreference.getIsFirstPermission()) {
+                    if (AppFlowConfig.SHOW_PERMISSION && sharePreference.getIsFirstPermission()) {
                         Intent(this@IntroActivity, PermissionActivity::class.java)
                     } else {
                         Intent(this@IntroActivity, MainActivity::class.java)

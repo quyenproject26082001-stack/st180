@@ -215,6 +215,7 @@
 
             <Button
                 android:id="@+id/btnAutumnPhoto"
+                android:visibility="gone"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:minHeight="72dp"
@@ -233,7 +234,7 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/free_piano_home"
                 android:textSize="22sp"
-                app:layout_constraintTop_toBottomOf="@id/btnAutumnPhoto"
+                app:layout_constraintTop_toBottomOf="@id/btnAutumnPiano"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
             <Button
