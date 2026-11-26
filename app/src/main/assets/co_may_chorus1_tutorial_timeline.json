@@ -1,0 +1,34 @@
+﻿[
+    {
+        "bar":  19,
+        "startMs":  0
+    },
+    {
+        "bar":  20,
+        "startMs":  3200
+    },
+    {
+        "bar":  21,
+        "startMs":  6400
+    },
+    {
+        "bar":  22,
+        "startMs":  9600
+    },
+    {
+        "bar":  23,
+        "startMs":  12800
+    },
+    {
+        "bar":  24,
+        "startMs":  16000
+    },
+    {
+        "bar":  25,
+        "startMs":  19200
+    },
+    {
+        "bar":  26,
+        "startMs":  22400
+    }
+]

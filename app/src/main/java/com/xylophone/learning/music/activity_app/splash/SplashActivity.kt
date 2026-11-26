@@ -38,6 +38,13 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     override fun initView() {
 
+        if (AppFlowConfig.DIRECT_TO_AUTUMN_PIANO) {
+            startActivity(Intent(this, com.xylophone.learning.music.activity_app.main.FallingPianoActivity::class.java)
+                .putExtra("piano_song", "co_may_chorus1_tutorial"))
+            finish()
+            return
+        }
+
         Admob.getInstance().setTimeCountdownNativeCollab(15000)
 
         Admob.getInstance().setTimeLimitShowAds(30000)

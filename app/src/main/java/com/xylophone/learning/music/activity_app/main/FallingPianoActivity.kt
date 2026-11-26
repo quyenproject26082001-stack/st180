@@ -44,6 +44,7 @@ class FallingPianoActivity : AppCompatActivity() {
     private val pianoSong get()=intent.getStringExtra("piano_song") ?: "autumn"
     private val isPhotoSheet get()=pianoSong=="autumn_photo"
     private val isCoMaySynthesia get()=pianoSong=="co_may_synthesia"
+    private val isCoMayChorus1 get()=pianoSong=="co_may_chorus1_tutorial"
     private val isEasyAutumn get()=pianoSong=="autumn_easy"
     private val isNoiNay by lazy { pianoSong=="noi_nay" || pianoSong=="noi_nay_advanced" }
     private val isAdvanced by lazy { pianoSong=="noi_nay_advanced" }
@@ -72,7 +73,7 @@ class FallingPianoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val json=JSONArray(assets.open(when(pianoSong) { "co_may_synthesia" -> "co_may_synthesia_notes.json"; "autumn_photo" -> "autumn_photo_notes.json"; "autumn_easy" -> "autumn_easy_notes.json"; "noi_nay_advanced" -> "noi_nay_advanced_notes.json"; "noi_nay" -> "noi_nay_notes.json"; else -> "autumn_notes.json" }).bufferedReader().use { it.readText() })
+        val json=JSONArray(assets.open(when(pianoSong) { "co_may_chorus1_tutorial" -> "co_may_chorus1_tutorial_notes.json"; "co_may_synthesia" -> "co_may_synthesia_notes.json"; "autumn_photo" -> "autumn_photo_notes.json"; "autumn_easy" -> "autumn_easy_notes.json"; "noi_nay_advanced" -> "noi_nay_advanced_notes.json"; "noi_nay" -> "noi_nay_notes.json"; else -> "autumn_notes.json" }).bufferedReader().use { it.readText() })
         score=(0 until json.length()).map { i -> json.getJSONObject(i).let {
             val pose=it.optJSONArray("pose")
             PianoLesson.Note(it.getInt("midi"),it.getDouble("start"),it.getDouble("end"),it.getInt("hand"),
@@ -85,7 +86,7 @@ class FallingPianoActivity : AppCompatActivity() {
         pointA=if(validRange) savedA else 0.0
         pointB=if(validRange) savedB else duration
         looping=validRange && practicePreferences.getBoolean("loop_enabled",false)
-        val timeline=JSONArray(assets.open(when(pianoSong) { "co_may_synthesia" -> "co_may_synthesia_timeline.json"; "autumn_photo" -> "autumn_photo_timeline.json"; "noi_nay_advanced" -> "noi_nay_advanced_timeline.json"; "noi_nay" -> "noi_nay_timeline.json"; else -> "lang_quen_chieu_thu_timeline.json" }).bufferedReader().use { it.readText() })
+        val timeline=JSONArray(assets.open(when(pianoSong) { "co_may_chorus1_tutorial" -> "co_may_chorus1_tutorial_timeline.json"; "co_may_synthesia" -> "co_may_synthesia_timeline.json"; "autumn_photo" -> "autumn_photo_timeline.json"; "noi_nay_advanced" -> "noi_nay_advanced_timeline.json"; "noi_nay" -> "noi_nay_timeline.json"; else -> "lang_quen_chieu_thu_timeline.json" }).bufferedReader().use { it.readText() })
         bars=(0 until timeline.length()).map { timeline.getJSONObject(it).let { row -> row.getInt("bar") to row.getDouble("startMs") } }
         sectionNames=(0 until timeline.length()).mapNotNull { i ->
             timeline.getJSONObject(i).let { row ->

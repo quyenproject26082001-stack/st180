@@ -15,14 +15,28 @@ class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Doubl
         private set
     var misses = 0
         private set
+    var wrongPresses = 0
+        private set
+    var earlyHits = 0
+        private set
+    var lateHits = 0
+        private set
+    var points = 0
+        private set
+    private val notePoints = IntArray(notes.size)
     var rangeEnd = (notes.maxOfOrNull { it.end } ?: 0.0) + 500
         private set
     val targetCount get() = results.count { it != 3 }
+    val maxPoints get() = targetCount * 100
+    val scorePercent: Int
+        get() = if (maxPoints == 0) 0 else (points * 100 / maxPoints).coerceIn(0, 100)
     fun seek(start: Double, end: Double = (notes.maxOfOrNull { it.end } ?: 0.0) + 500) {
         require(start >= 0 && end > start)
         position = start
         rangeEnd = end
-        hits = 0; misses = 0
+        hits = 0; misses = 0; wrongPresses = 0; earlyHits = 0; lateHits = 0
+        points = 0
+        notePoints.fill(0)
         notes.forEachIndexed { i, note -> results[i] = if (note.start < start || note.start >= end) 3 else 0 }
     }
     val finished get() = position >= rangeEnd
@@ -44,7 +58,7 @@ class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Doubl
         if (demonstration || !waitMode) return emptyList()
         val accepted=mutableListOf<Int>()
         notes.indices.filter { results[it] == 0 && notes[it].midi in held && notes[it].start <= position }.forEach {
-            results[it]=1; hits++; accepted += notes[it].midi
+            results[it]=1; hits++; notePoints[it] = 100; points += 100; accepted += notes[it].midi
         }
         return accepted
     }
@@ -57,17 +71,33 @@ class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Doubl
         if (waitMode && retryChordOnMistake && pendingStart != null) {
             val belongs = notes.indices.any { notes[it].start == pendingStart && notes[it].midi == midi }
             if (!belongs) {
+                wrongPresses++
                 val reset = notes.indices.filter { notes[it].start == pendingStart && results[it] == 1 }
-                reset.forEach { results[it] = 0 }
+                reset.forEach { results[it] = 0; points -= notePoints[it]; notePoints[it] = 0 }
                 hits -= reset.size
                 return "Sai nÃ³t â€¢ ÄÃ¡nh láº¡i há»£p Ã¢m"
             }
         }
         val index = notes.indices.filter { results[it] == 0 && notes[it].midi == midi }
-            .minByOrNull { abs(notes[it].start - position) } ?: return "Sai nốt"
+            .minByOrNull { abs(notes[it].start - position) } ?: run {
+                wrongPresses++
+                return "Sai nốt"
+            }
         val delta = (position - notes[index].start) / speed
-        if (abs(delta) > 180) return if (delta < 0) "Quá sớm" else "Quá muộn"
+        if (abs(delta) > 180) {
+            wrongPresses++
+            return if (delta < 0) "Quá sớm" else "Quá muộn"
+        }
         results[index] = 1; hits++
+        val timingPoints = when {
+            abs(delta) <= 70 -> 100
+            abs(delta) <= 130 -> 75
+            else -> 50
+        }
+        notePoints[index] = timingPoints
+        points += timingPoints
+        if (delta < -70) earlyHits++
+        if (delta > 70) lateHits++
         return if (waitMode || abs(delta) <= 70) "Đúng" else if (delta < 0) "Sớm" else "Muộn"
     }
 }

@@ -127,4 +127,15 @@ class PianoLessonTest {
         assertEquals(emptyList<Int>(),lesson.autoAcceptHeld(setOf(60)))
         assertEquals(0,lesson.hits)
     }
+    @Test fun rhythmModeAwardsMorePointsForAccurateTiming() {
+        val lesson=PianoLesson(listOf(note(60), note(64,500.0), note(67,1000.0)),false,1.0)
+        lesson.seek(0.0,1500.0)
+        lesson.press(60)
+        lesson.advance(570.0)
+        lesson.press(64)
+        lesson.advance(560.0)
+        lesson.press(67)
+        assertEquals(275,lesson.points)
+        assertEquals(91,lesson.scorePercent)
+    }
 }
