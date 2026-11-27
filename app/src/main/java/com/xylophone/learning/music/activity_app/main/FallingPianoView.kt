@@ -22,62 +22,121 @@ class FallingPianoView(context: Context) : View(context) {
     private var guidePosition=Double.NaN
     var externalHeldNotes: Set<Int> = emptySet()
         set(value) { field = value; invalidate() }
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG)
     private val fingers = mutableMapOf<Int, Int>()
-    private var whites = (60..93).filter { white(it) }
     private var range = 36..93
-    private fun white(m: Int) = m % 12 !in listOf(1,3,6,8,10)
+    private var whites = range.filter(::white)
+    private var blacks = range.filterNot(::white)
+    private var drawOrder = whites + blacks
+    private val keyRects = Array(128) { RectF() }
+    private val keyNames = Array(128) { midi ->
+        NOTE_NAMES[midi % 12] + (midi / 12 - 1)
+    }
+    private val dueKeys = BooleanArray(128)
+    private val soundingKeys = BooleanArray(128)
+    private var latestEnds = DoubleArray(0)
+
+    private fun white(m: Int) = when (m % 12) {
+        1, 3, 6, 8, 10 -> false
+        else -> true
+    }
+
     fun configure(notes: List<PianoLesson.Note>) {
         releaseKeys()
         guidePoses.clear()
-        val displayed=notes.flatMap { listOf(it.midi)+it.pose }
-        var low = displayed.min(); var high = displayed.max()
+        val displayed = notes.flatMap { listOf(it.midi) + it.pose }
+        var low = displayed.minOrNull() ?: 36
+        var high = displayed.maxOrNull() ?: 93
         while (!white(low)) low--
         while (!white(high)) high++
-        range = low..high; whites = range.filter { white(it) }
+        range = low..high
+        whites = range.filter(::white)
+        blacks = range.filterNot(::white)
+        drawOrder = whites + blacks
+        rebuildGeometry()
+
+        // Notes are sorted by attack time. Keep long notes visible after their attack scrolls past.
+        var latestEnd = Double.NEGATIVE_INFINITY
+        latestEnds = DoubleArray(notes.size) { index ->
+            latestEnd = maxOf(latestEnd, notes[index].end)
+            latestEnd
+        }
         invalidate()
     }
+
     private val line get() = height * .60f
-    private fun rect(m: Int): RectF {
-        val w = width.toFloat() / whites.size
-        if (white(m)) { val x = whites.indexOf(m)*w; return RectF(x,line,x+w,height.toFloat()) }
-        val x = whites.count { it < m }*w
-        return RectF(x-w*.30f,line,x+w*.30f,line+(height-line)*.62f)
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        rebuildGeometry()
     }
-    private fun name(m: Int) = arrayOf("C","C♯","D","E♭","E","F","F♯","G","A♭","A","B♭","B")[m%12]+(m/12-1)
+
+    private fun rebuildGeometry() {
+        val keyWidth = width.toFloat() / whites.size
+        var whiteIndex = 0
+        for (midi in range) {
+            val x = whiteIndex * keyWidth
+            if (white(midi)) {
+                keyRects[midi].set(x, line, x + keyWidth, height.toFloat())
+                whiteIndex++
+            } else {
+                keyRects[midi].set(x - keyWidth * .30f, line, x + keyWidth * .30f,
+                    line + (height - line) * .62f)
+            }
+        }
+    }
+
+    private fun firstNoteEndingAfter(position: Double): Int {
+        var low = 0
+        var high = latestEnds.size
+        while (low < high) {
+            val middle = (low + high) ushr 1
+            if (latestEnds[middle] < position) low = middle + 1 else high = middle
+        }
+        return low
+    }
     override fun onDraw(c: Canvas) {
         c.drawColor(Color.rgb(19,27,40))
         val model = lesson ?: return
         paint.strokeWidth = 1f
         whites.forEach { m ->
-            paint.color=Color.rgb(42,53,67); val r=rect(m)
+            paint.color=Color.rgb(42,53,67); val r=keyRects[m]
             c.drawLine(r.left,0f,r.left,line,paint)
         }
         c.save(); c.clipRect(0f,0f,width.toFloat(),line)
-        model.notes.forEachIndexed { i,n ->
-            if (model.results[i] == 3) return@forEachIndexed
-            val bottom=line-((n.start-model.position)/2500*line).toFloat()
-            val top=line-((n.end-model.position)/2500*line).toFloat()
+        dueKeys.fill(false)
+        soundingKeys.fill(false)
+        val position = model.position
+        for (i in firstNoteEndingAfter(position - 90)..model.notes.lastIndex) {
+            val n = model.notes[i]
+            if (n.start > position + 2500) break
+            val result = model.results[i]
+            if (result == 3) continue
+            if (result == 0 && kotlin.math.abs(n.start - position) < 90) dueKeys[n.midi] = true
+            if (result == 4 && n.start <= position && position < n.end) soundingKeys[n.midi] = true
+            val bottom=line-((n.start-position)/2500*line).toFloat()
+            val top=line-((n.end-position)/2500*line).toFloat()
             if (bottom >= 0 && top <= line) {
-                val r=rect(n.midi)
+                val r=keyRects[n.midi]
                 paint.color=when(model.results[i]) {1, 4 -> Color.rgb(81,191,127); 2 -> Color.rgb(220,90,90); else -> if(n.hand==0) Color.rgb(80,173,244) else Color.rgb(237,173,86)}
                 c.drawRoundRect(r.left+2,top,r.right-2,maxOf(top+8,bottom),5f,5f,paint)
                 paint.color=Color.WHITE; paint.textSize=11*resources.displayMetrics.scaledDensity
-                c.drawText(name(n.midi),r.left+3,bottom-4,paint)
+                c.drawText(keyNames[n.midi],r.left+3,bottom-4,paint)
             }
         }
         c.restore()
-        for (m in whites + range.filter { !white(it) }) {
-            val r=rect(m)
-            val due=model.notes.indices.any { model.results[it]==0 && model.notes[it].midi==m && kotlin.math.abs(model.notes[it].start-model.position)<90 }
-            paint.color=when { m in externalHeldNotes || fingers.containsValue(m) || model.notes.indices.any {
-                model.results[it]==4 && model.notes[it].midi==m &&
-                    model.position>=model.notes[it].start && model.position<model.notes[it].end
-            }->Color.rgb(81,191,127); due->Color.rgb(244,194,93); white(m)->Color.WHITE; else->Color.rgb(34,34,40) }
+        for (m in drawOrder) {
+            val r = keyRects[m]
+            paint.color=when {
+                m in externalHeldNotes || fingers.containsValue(m) || soundingKeys[m] -> Color.rgb(81,191,127)
+                dueKeys[m] -> Color.rgb(244,194,93)
+                white(m) -> Color.WHITE
+                else -> Color.rgb(34,34,40)
+            }
             c.drawRect(r.left+1,r.top+2,r.right-1,r.bottom,paint)
             paint.color=if(white(m)) Color.DKGRAY else Color.WHITE
             paint.textSize=10*resources.displayMetrics.scaledDensity
-            c.drawText(name(m),r.left+2,r.bottom-10,paint)
+            c.drawText(keyNames[m],r.left+2,r.bottom-10,paint)
         }
         paint.color=Color.rgb(244,194,93); paint.strokeWidth=4f
         c.drawLine(0f,line,width.toFloat(),line,paint)
@@ -100,7 +159,7 @@ class FallingPianoView(context: Context) : View(context) {
             val focus=model.notes[targets.last()]
             val desired=FloatArray(10)
             for(f in 0..4) {
-                val r=rect(focus.pose[f])
+                val r=keyRects[focus.pose[f]]
                 desired[f*2]=r.centerX()
                 desired[f*2+1]=if(white(focus.pose[f])) line+keyHeight*(if(f==0) .67f else .40f) else r.bottom-radius*1.4f
             }
@@ -155,7 +214,8 @@ class FallingPianoView(context: Context) : View(context) {
     }
     private fun key(x:Float,y:Float): Int? {
         if(y<line || y>height || x<0 || x>=width) return null
-        return (range.filter { !white(it) }+whites).firstOrNull { rect(it).contains(x,y) }
+        return blacks.firstOrNull { keyRects[it].contains(x, y) }
+            ?: whites.firstOrNull { keyRects[it].contains(x, y) }
     }
     fun releaseKeys() { fingers.values.toSet().forEach(onUp); fingers.clear(); invalidate() }
     override fun onTouchEvent(e: MotionEvent): Boolean {
@@ -177,4 +237,8 @@ class FallingPianoView(context: Context) : View(context) {
         invalidate(); return true
     }
     override fun performClick():Boolean { super.performClick(); return true }
+
+    private companion object {
+        val NOTE_NAMES = arrayOf("C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B")
+    }
 }

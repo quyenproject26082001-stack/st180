@@ -7,10 +7,12 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.graphics.Color
+import android.view.Choreographer
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONArray
+import kotlin.math.ceil
 
 class FallingPianoActivity : AppCompatActivity() {
     private lateinit var roll: FallingPianoView
@@ -19,7 +21,7 @@ class FallingPianoActivity : AppCompatActivity() {
     private var demonstration=false
     private lateinit var play: Button
     private lateinit var pool: SoundPool
-    private val handler=Handler(Looper.getMainLooper())
+    private val choreographer by lazy { Choreographer.getInstance() }
     private val envelopes=Handler(Looper.getMainLooper())
     private val voiceVolumes=mutableMapOf<Int,Float>()
     private val sounds=mutableMapOf<Int,Int>()
@@ -32,7 +34,8 @@ class FallingPianoActivity : AppCompatActivity() {
     private var midiEcho=false
     private var midiPedal=false
     private val backing=mutableMapOf<Int,Int>()
-    private val accompanied=mutableSetOf<Int>()
+    private var nextBackingNote = 0
+    private val interruptedBacking = mutableListOf<Int>()
     private lateinit var score: List<PianoLesson.Note>
     private lateinit var lesson: PianoLesson
     private lateinit var seekBar: SeekBar
@@ -68,7 +71,13 @@ class FallingPianoActivity : AppCompatActivity() {
     private var running=false
     private var ready=false
     private var sustain=false
-    private var lastFrame=0L
+    private var lastFrameNanos = 0L
+    private var lastStatusNanos = 0L
+    private var demoAudio: PianoDemoAudio? = null
+    private var demoRangeStart = 0.0
+    private var demoStartPosition = 0.0
+    private var demoStartNanos = 0L
+    private val usesSeparateDemoAudio get() = demonstration && isCoMaySynthesia
     private var feedback="Nhấn Bắt đầu • Xanh: tay phải • Cam: tay trái"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +116,12 @@ class FallingPianoActivity : AppCompatActivity() {
         tempo.setOnClickListener { speed=when(speed) {.5->.75; .75->1.0; else->.5}; tempo.text="${(speed*100).toInt()}%"; changeSettings() }
         val pedal=button("Pedal: tắt") {}
         pedal.setOnClickListener { sustain=!sustain; pedal.text=if(sustain) "Pedal: bật" else "Pedal: tắt"; if(!sustain) streams.keys.toList().filter { it !in held }.forEach { release(it) } }
-        play=button("Đang tải…") { if(running) pause() else if(ready) { if(lesson.finished) reset(); running=true; started=true; lastFrame=SystemClock.uptimeMillis(); updateStatus(); handler.post(frame) } }
+        play=button("Đang tải…") {
+            if (running) pause() else if (ready) {
+                if (lesson.finished) reset()
+                startPlayback()
+            }
+        }
         play.isEnabled=false
         button("Chơi lại") { reset() }
         controlPanel.addView(controls)
@@ -358,16 +372,10 @@ class FallingPianoActivity : AppCompatActivity() {
         countdown=remainingCountdown
         started=wasStarted
         feedback=if(waitMode) "Đánh phím sáng để tiếp tục" else "Đánh khi nốt chạm vạch vàng"
-        if(wasRunning && ready) {
-            running=true
-            lastFrame=SystemClock.uptimeMillis()
-            handler.post(frame)
-        }
-        updateStatus()
+        if (wasRunning && ready) startPlayback() else updateStatus()
     }
     private fun reset() {
         pause()
-        accompanied.clear()
         lesson=PianoLesson(score.filter { demonstration || hand==2 || it.hand==hand },waitMode,speed,demonstration,retryChordOnMistake)
         roll.lesson=lesson; roll.configure(lesson.notes)
         feedback="${if(waitMode) "Đánh phím sáng để tiếp tục" else "Đánh khi nốt chạm vạch vàng"} • Giữ theo độ dài thanh"
@@ -378,23 +386,42 @@ class FallingPianoActivity : AppCompatActivity() {
     private fun updateMarkers() {
         val location=if(isCoMaySynthesia) "Đoạn ${currentBar()+1}/${bars.size} • ${sectionNames[bars[currentBar()].first].orEmpty()}" else "Ô ${bars[currentBar()].first} (lượt ${currentBar()+1}/${bars.size})"
         val endLabel=if(isCoMaySynthesia) "B: hết đoạn đang chọn" else "B: hết ô đang chọn"
-        markers.text="${time(lesson.position.coerceAtLeast(0.0))} / ${time(duration)} • $location • A ${time(pointA)} – B ${time(pointB)} • $endLabel"
+        markers.updateText("${time(lesson.position.coerceAtLeast(0.0))} / ${time(duration)} • $location • A ${time(pointA)} – B ${time(pointB)} • $endLabel")
     }
     private fun seekTo(target:Double, resume:Boolean) {
         pause()
         val start=if(looping) target.coerceIn(pointA,pointB-1) else target.coerceIn(0.0,duration-1)
         lesson.seek(start,if(looping) pointB else duration)
-        accompanied.clear()
-        score.forEachIndexed { i,n -> if(n.start<start) accompanied.add(i) }
+        demoRangeStart = start
+        interruptedBacking.clear()
+        nextBackingNote = score.indexOfFirst { it.start >= start }.let { if (it < 0) score.size else it }
         countdown=3000.0
         started=false
         roll.invalidate(); updateStatus()
-        if(resume && ready) {
-            running=true; started=true; lastFrame=SystemClock.uptimeMillis(); updateStatus(); handler.post(frame)
-        }
+        if (resume && ready) startPlayback()
     }
+
+    private fun startPlayback() {
+        running = true
+        started = true
+        lastFrameNanos = 0L
+        lastStatusNanos = 0L
+        if (usesSeparateDemoAudio) {
+            val waitMillis = ceil(countdown).toLong()
+            val startUptime = SystemClock.uptimeMillis() + waitMillis
+            demoStartNanos = System.nanoTime() + waitMillis * 1_000_000L
+            demoStartPosition = lesson.position
+            val audio = demoAudio ?: PianoDemoAudio(pool, sounds.toMap(), score).also { demoAudio = it }
+            audio.start(demoStartPosition, demoRangeStart, lesson.rangeEnd, speed, startUptime)
+        }
+        updateStatus()
+        choreographer.postFrameCallback(frame)
+    }
+
     private fun pause() {
-        running=false; handler.removeCallbacksAndMessages(null)
+        running = false
+        choreographer.removeFrameCallback(frame)
+        demoAudio?.stop()
         if(::midiState.isInitialized) midiState.reset()
         midiHeld.clear()
         midiStreams.values.forEach(pool::stop); midiStreams.clear()
@@ -403,12 +430,16 @@ class FallingPianoActivity : AppCompatActivity() {
         voiceVolumes.keys.toList().forEach(pool::stop)
         voiceVolumes.clear()
         streams.values.forEach(pool::stop); streams.clear(); held.clear()
-        backing.keys.toList().forEach { accompanied.remove(it) }
-        backing.values.forEach(pool::stop); backing.clear()
+        interruptedBacking.addAll(backing.keys)
+        backing.clear()
         if(::lesson.isInitialized) updateStatus()
     }
     private fun updateStatus() {
-        if(!dragging) { seekBar.progress=lesson.position.toInt().coerceAtLeast(0); updateMarkers() }
+        if (!dragging) {
+            val position = lesson.position.toInt().coerceAtLeast(0)
+            if (seekBar.progress != position) seekBar.progress = position
+            updateMarkers()
+        }
         val waiting=running && countdown<=0 && lesson.notes.indices.any {
             lesson.results[it]==0 && lesson.notes[it].start<=lesson.position
         } && waitMode && !demonstration
@@ -422,53 +453,107 @@ class FallingPianoActivity : AppCompatActivity() {
             waiting -> "Đang chờ bạn đánh đúng nốt"
             else -> "Đang chơi"
         }
-        if(ready) play.text=when {
+        if (ready) play.updateText(when {
             running -> "Ⅱ Tạm dừng"
             lesson.finished -> "↻ Chơi lại"
             started -> "▶ Tiếp tục"
             else -> "▶ Bắt đầu"
-        }
-        play.contentDescription=if(running) "Tạm dừng bài đang chơi" else play.text
-        correctOnlyButton.isEnabled=waitMode && !demonstration
-        correctOnlyButton.text=if(correctOnly) "Chỉ nốt đúng: bật" else "Chỉ nốt đúng: tắt"
-        holdButton.isEnabled=waitMode && !demonstration
-        holdButton.text=if(holdSupport) "Giữ nốt: bật" else "Giữ nốt: tắt"
-        demo.text=if(demonstration) "↩ Tự chơi" else "▶ Chơi mẫu"
+        })
+        val description = if (running) "Tạm dừng bài đang chơi" else play.text
+        if (play.contentDescription != description) play.contentDescription = description
+        val practiceButtonsEnabled = waitMode && !demonstration
+        if (correctOnlyButton.isEnabled != practiceButtonsEnabled) correctOnlyButton.isEnabled = practiceButtonsEnabled
+        correctOnlyButton.updateText(if (correctOnly) "Chỉ nốt đúng: bật" else "Chỉ nốt đúng: tắt")
+        if (holdButton.isEnabled != practiceButtonsEnabled) holdButton.isEnabled = practiceButtonsEnabled
+        holdButton.updateText(if (holdSupport) "Giữ nốt: bật" else "Giữ nốt: tắt")
+        demo.updateText(if (demonstration) "↩ Tự chơi" else "▶ Chơi mẫu")
         val progress=if(demonstration) "Chơi mẫu • Không chấm điểm" else "Đúng ${lesson.hits}/${lesson.targetCount} • Bỏ lỡ ${lesson.misses}"
-        status.text="$state  |  $progress  |  ${maxOf(0,lesson.position.toInt()/1000)}s" +
-            if(running && countdown<=0 && !demonstration) "  |  $feedback" else ""
+        status.updateText("$state  |  $progress  |  ${maxOf(0,lesson.position.toInt()/1000)}s" +
+            if(running && countdown<=0 && !demonstration) "  |  $feedback" else "")
 
     }
-    private val frame=object:Runnable {
-        override fun run() {
-            if(!running) return
-            val now=SystemClock.uptimeMillis()
-            var elapsed=(now-lastFrame).toDouble(); lastFrame=now
-            if(countdown>0) {
-                val consumed=minOf(elapsed,countdown)
-                countdown-=consumed; elapsed-=consumed
-                if(countdown>0) { updateStatus(); handler.postDelayed(this,16); return }
+    private fun TextView.updateText(value: String) {
+        if (text != value) text = value
+    }
+
+    private fun refreshPlaybackStatus(frameTimeNanos: Long) {
+        if (frameTimeNanos - lastStatusNanos >= 100_000_000L) {
+            lastStatusNanos = frameTimeNanos
+            updateStatus()
+        }
+    }
+
+    private fun playBackingNote(index: Int) {
+        val note = score[index]
+        if ((!demonstration && note.hand == hand) || note.start >= lesson.rangeEnd ||
+            note.end <= lesson.position) return
+        // Reserve mix headroom for overlapping samples and dense chords.
+        val volume = if (demonstration) {
+            if (note.hand == 0) .45f else .325f
+        } else .35f
+        backing[index] = playSoft(note.midi, volume, 0)
+    }
+
+    private fun updateBacking() {
+        if (demonstration || hand != 2) {
+            interruptedBacking.forEach(::playBackingNote)
+            interruptedBacking.clear()
+            while (nextBackingNote < score.size && score[nextBackingNote].start <= lesson.position) {
+                playBackingNote(nextBackingNote++)
             }
+        }
+        val playing = backing.entries.iterator()
+        while (playing.hasNext()) {
+            val (index, stream) = playing.next()
+            if (score[index].end <= lesson.position) {
+                playing.remove()
+                fadeOut(stream)
+            }
+        }
+    }
+
+    private val frame = object : Choreographer.FrameCallback {
+        override fun doFrame(frameTimeNanos: Long) {
+            if (!running) return
+            val firstFrame = lastFrameNanos == 0L
+            var elapsed = if (firstFrame) 0.0 else (frameTimeNanos - lastFrameNanos) / 1_000_000.0
+            lastFrameNanos = frameTimeNanos
+            val separateAudio = usesSeparateDemoAudio
+            if (separateAudio) {
+                val timeSinceStart = (frameTimeNanos - demoStartNanos) / 1_000_000.0
+                countdown = maxOf(0.0, -timeSinceStart)
+                val targetPosition = demoStartPosition + maxOf(0.0, timeSinceStart) * speed
+                elapsed = maxOf(0.0, targetPosition - lesson.position) / speed
+            } else if (countdown > 0) {
+                val consumed = minOf(elapsed, countdown)
+                countdown -= consumed
+                elapsed -= consumed
+            }
+            if (countdown > 0) {
+                refreshPlaybackStatus(frameTimeNanos)
+                choreographer.postFrameCallback(this)
+                return
+            }
+            val previousPosition = lesson.position
             lesson.advance(elapsed)
-            if(holdSupport && waitMode && !demonstration) {
-                lesson.autoAcceptHeld(held).forEach { midi ->
-                    // Re-trigger the sample for each repeated attack while the finger stays down.
-                    streams.remove(midi)?.let { fadeOut(it) }
-                    streams[midi]=playSoft(midi, playerVolume(midi), 1)
-                }
+            val accepted = if (holdSupport && waitMode && !demonstration) lesson.autoAcceptHeld(held)
+                else emptyList()
+            accepted.forEach { midi ->
+                streams.remove(midi)?.let { fadeOut(it) }
+                streams[midi] = playSoft(midi, playerVolume(midi), 1)
             }
-            if(demonstration || hand!=2) score.forEachIndexed { i,n ->
-                if((demonstration || n.hand!=hand) && n.start<lesson.rangeEnd && n.start<=lesson.position && i !in accompanied) {
-                    accompanied.add(i)
-                    // Demo includes dense chords: reserve mix headroom after sample normalization.
-                    if(n.end>lesson.position) run { backing[i]=playSoft(n.midi, if(demonstration) { if(n.hand==0) .45f else .325f } else .35f, 0) }
-                }
+            if (!separateAudio) updateBacking()
+            if (firstFrame || lesson.position != previousPosition || accepted.isNotEmpty()) roll.invalidate()
+            refreshPlaybackStatus(frameTimeNanos)
+            if (lesson.finished && looping) {
+                seekTo(pointA, true)
+            } else if (lesson.finished) {
+                pause()
+                feedback = "Hoàn thành • Nhấn Chơi lại để luyện tiếp"
+                updateStatus()
+            } else {
+                choreographer.postFrameCallback(this)
             }
-            backing.keys.toList().filter { score[it].end<=lesson.position }.forEach { backing.remove(it)?.let { stream -> fadeOut(stream) } }
-            roll.invalidate(); updateStatus()
-            if(lesson.finished && looping) { seekTo(pointA,true); return }
-            if(lesson.finished) { pause(); feedback="Hoàn thành • Nhấn Chơi lại để luyện tiếp"; updateStatus() }
-            else handler.postDelayed(this,16)
         }
     }
     private fun saveLoop() {
@@ -493,5 +578,10 @@ class FallingPianoActivity : AppCompatActivity() {
     }
     override fun onStart() { super.onStart(); if(::midiInput.isInitialized) midiInput.start() }
     override fun onStop() { if(::midiInput.isInitialized) midiInput.stop(); pause(); saveLoop(); super.onStop() }
-    override fun onDestroy() { if(::midiInput.isInitialized) midiInput.close(); pool.release(); super.onDestroy() }
+    override fun onDestroy() {
+        if (::midiInput.isInitialized) midiInput.close()
+        val audio = demoAudio
+        if (audio == null) pool.release() else audio.close()
+        super.onDestroy()
+    }
 }

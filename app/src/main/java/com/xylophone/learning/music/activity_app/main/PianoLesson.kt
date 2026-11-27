@@ -42,23 +42,31 @@ class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Doubl
     val finished get() = position >= rangeEnd
     fun advance(elapsed: Double) {
         var next = position + elapsed * speed
-        if (demonstration) {
-            notes.indices.filter { results[it] == 0 && notes[it].start <= next }.forEach { results[it] = 4 }
-        } else if (waitMode) {
-            val pending = notes.indices.filter { results[it] == 0 }.minOfOrNull { notes[it].start }
-            if (pending != null) next = minOf(next, pending)
-        } else {
-            notes.indices.filter { results[it] == 0 && next - notes[it].start > 180 * speed }.forEach {
-                results[it] = 2; misses++
+        for (index in notes.indices) {
+            if (results[index] != 0) continue
+            val start = notes[index].start
+            when {
+                demonstration -> if (start <= next) results[index] = 4
+                waitMode -> next = minOf(next, start)
+                next - start > 180 * speed -> {
+                    results[index] = 2
+                    misses++
+                }
             }
         }
         position = minOf(next, rangeEnd)
     }
     fun autoAcceptHeld(held: Set<Int>): List<Int> {
-        if (demonstration || !waitMode) return emptyList()
-        val accepted=mutableListOf<Int>()
-        notes.indices.filter { results[it] == 0 && notes[it].midi in held && notes[it].start <= position }.forEach {
-            results[it]=1; hits++; notePoints[it] = 100; points += 100; accepted += notes[it].midi
+        if (demonstration || !waitMode || held.isEmpty()) return emptyList()
+        val accepted = mutableListOf<Int>()
+        for (index in notes.indices) {
+            val note = notes[index]
+            if (results[index] != 0 || note.midi !in held || note.start > position) continue
+            results[index] = 1
+            hits++
+            notePoints[index] = 100
+            points += 100
+            accepted += note.midi
         }
         return accepted
     }
