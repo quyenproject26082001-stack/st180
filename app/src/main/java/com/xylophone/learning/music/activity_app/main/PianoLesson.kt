@@ -75,7 +75,7 @@ class PianoLesson(val notes: List<Note>, val waitMode: Boolean, val speed: Doubl
                 val reset = notes.indices.filter { notes[it].start == pendingStart && results[it] == 1 }
                 reset.forEach { results[it] = 0; points -= notePoints[it]; notePoints[it] = 0 }
                 hits -= reset.size
-                return "Sai nÃ³t â€¢ ÄÃ¡nh láº¡i há»£p Ã¢m"
+                return "Sai nốt • Đánh lại hợp âm"
             }
         }
         val index = notes.indices.filter { results[it] == 0 && notes[it].midi == midi }

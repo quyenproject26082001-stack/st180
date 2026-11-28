@@ -156,6 +156,19 @@
     <string name="autumn_falling_notes">Chơi theo nốt rơi</string>
     <string name="free_piano_home">Piano tự do</string>
     <string name="autumn_photo_home">Lãng Quên Chiều Thu • Bản cô Mây\nHọc cảm ứng / đàn thật MIDI</string>
+    <string name="autumn_co_may_mix_choice">Bản phối Minh Khang × Synthesia cô Mây</string>
+    <string name="autumn_co_may_mix_title">Lãng Quên Chiều Thu • Bản phối Minh Khang × Synthesia cô Mây</string>
+    <string name="autumn_jeanie_choice">Bản Jeanie • Sheet hai tay</string>
+    <string name="autumn_jeanie_title">Lãng Quên Chiều Thu • Bản Jeanie • Mi trưởng • 110 BPM</string>
+    <string name="autumn_jeanie_no_browser">Cần trình duyệt để mở sheet bản Jeanie</string>
+    <string name="moon_represents_my_heart_home">Ánh Trăng Nói Hộ Lòng Tôi</string>
+    <string name="moon_represents_my_heart_title">Ánh Trăng Nói Hộ Lòng Tôi • Đinh Quang Đức • 80 BPM</string>
+    <string name="moon_represents_my_heart_no_browser">Cần trình duyệt để mở sheet Ánh Trăng Nói Hộ Lòng Tôi</string>
     <string name="noi_nay_piano_home">Nơi này có anh • Piano bản dễ</string>
     <string name="noi_nay_advanced_home">Nơi này có anh • Bản khó</string>
+    <string name="instant_eternity_home">Instant Eternity • Bản trung cấp</string>
+    <string name="instant_eternity_title">Instant Eternity • Si trưởng • 80 BPM</string>
+    <string name="instant_eternity_easy_home">Instant Eternity • Bản dễ</string>
+    <string name="instant_eternity_easy_title">Instant Eternity • Bản dễ • Đô trưởng • 68 BPM</string>
+    <string name="instant_eternity_no_browser">Cần trình duyệt để mở sheet Instant Eternity</string>
 </resources>

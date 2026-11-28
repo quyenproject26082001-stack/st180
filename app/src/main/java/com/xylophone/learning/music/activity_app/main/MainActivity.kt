@@ -78,6 +78,18 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
             btnNoiNayAdvanced.setOnSingleClick {
                 startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java).putExtra("piano_song","noi_nay_advanced"))
             }
+            btnInstantEternity.setOnSingleClick {
+                startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java)
+                    .putExtra("piano_song", INSTANT_ETERNITY_SONG_ID))
+            }
+            btnInstantEternityEasy.setOnSingleClick {
+                startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java)
+                    .putExtra("piano_song", INSTANT_ETERNITY_EASY_SONG_ID))
+            }
+            btnMoonRepresentsMyHeart.setOnSingleClick {
+                startActivity(android.content.Intent(this@MainActivity, FallingPianoActivity::class.java)
+                    .putExtra("piano_song", MOON_REPRESENTS_MY_HEART_SONG_ID))
+            }
             btnFreePiano.setOnSingleClick { startIntentRightToLeft(FreePianoActivity::class.java) }
             btnAutumnPhoto.setOnSingleClick {
                 showAutumnChoices()
@@ -91,13 +103,20 @@ class MainActivity : BaseActivity<ActivityHomeBinding>() {
     }
 
     private fun showAutumnChoices() {
-        val labels = arrayOf("Bản nâng cao", "Bản cô Mây", "Bản dễ • Tay trái đơn giản", "Synthesia cô Mây", "Điệp khúc 1 • Theo hướng dẫn cô Mây")
-        val ids = arrayOf("autumn", "autumn_photo", "autumn_easy", "co_may_synthesia", "co_may_chorus1_tutorial")
+        val choices = listOf(
+            "Bản nâng cao" to "autumn",
+            "Bản cô Mây" to "autumn_photo",
+            "Bản dễ • Tay trái đơn giản" to "autumn_easy",
+            "Synthesia cô Mây" to "co_may_synthesia",
+            "Điệp khúc 1 • Theo hướng dẫn cô Mây" to "co_may_chorus1_tutorial",
+            getString(R.string.autumn_co_may_mix_choice) to AUTUMN_CO_MAY_MIX_SONG_ID,
+            getString(R.string.autumn_jeanie_choice) to AUTUMN_JEANIE_SONG_ID,
+        )
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Lãng Quên Chiều Thu")
-            .setItems(labels) { _, which ->
+            .setItems(choices.map { it.first }.toTypedArray()) { _, which ->
                 startActivity(android.content.Intent(this, FallingPianoActivity::class.java)
-                    .putExtra("piano_song", ids[which]))
+                    .putExtra("piano_song", choices[which].second))
             }.show()
     }
 

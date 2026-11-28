@@ -34,7 +34,7 @@ import androidx.core.content.ContextCompat
 class PianoMidiInput(
     private val activity: AppCompatActivity,
     private val onStatus: (String, Boolean) -> Unit,
-    private val onMessage: (Int, Int, Int) -> Unit,
+    private val onMessage: (Int, Int, Int, MidiArrival) -> Unit,
     private val onDisconnected: () -> Unit
 ) {
     private val handler = Handler(Looper.getMainLooper())
@@ -221,12 +221,22 @@ class PianoMidiInput(
                     val output = outputNumber?.let { opened.openOutputPort(it) }
                     if (output == null) { disconnect("Đàn không có cổng MIDI gửi nốt khả dụng"); return@OnDeviceOpenedListener }
                     port = output
+                    var receivedAt = 0L
+                    var eventAt = 0L
                     val parser = MidiStreamParser { status, data, value ->
-                        handler.post { if (active && generation == request) onMessage(status, data, value) }
+                        val arrival = MidiArrival(receivedAt, eventAt)
+                        handler.post {
+                            if (active && generation == request) onMessage(status, data, value, arrival)
+                        }
                     }
                     output.connect(object : MidiReceiver() {
                         override fun onSend(msg: ByteArray, offset: Int, count: Int, timestamp: Long) {
-                            synchronized(parser) { parser.receive(msg, offset, count) }
+                            val callbackAt = System.nanoTime()
+                            synchronized(parser) {
+                                receivedAt = callbackAt
+                                eventAt = timestamp
+                                parser.receive(msg, offset, count)
+                            }
                         }
                     })
                     onStatus("Đã kết nối ${name(opened.info)} • Đánh phím để học", true)

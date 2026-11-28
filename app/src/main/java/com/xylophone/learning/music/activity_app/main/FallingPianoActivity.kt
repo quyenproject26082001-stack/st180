@@ -1,16 +1,32 @@
 package com.xylophone.learning.music.activity_app.main
 
+import android.content.pm.ApplicationInfo
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.SoundPool
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.graphics.Color
+import android.util.Log
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.xylophone.learning.music.R
 import org.json.JSONArray
+
+internal const val INSTANT_ETERNITY_SONG_ID = "instant_eternity"
+internal const val INSTANT_ETERNITY_EASY_SONG_ID = "instant_eternity_easy"
+internal const val AUTUMN_CO_MAY_MIX_SONG_ID = "autumn_co_may_mix"
+internal const val AUTUMN_JEANIE_SONG_ID = "autumn_jeanie"
+internal const val MOON_REPRESENTS_MY_HEART_SONG_ID = "moon_represents_my_heart"
+private const val AUTUMN_JEANIE_SHEET_URL =
+    "https://truongca.com/images/sheet/pdf/zhou/zhou-hua-jian-qi-shi-bu-xiang-zou-piano-wakin-chau-truongca.com.pdf"
+private const val MOON_REPRESENTS_MY_HEART_SHEET_URL =
+    "https://truongca.com/images/sheet/pdf/anh/anh-trang-noi-ho-long-toi-the-moon-represents-my-heart-piano-dinh-quang-duc-truongca.com.pdf"
 
 class FallingPianoActivity : AppCompatActivity() {
     private lateinit var roll: FallingPianoView
@@ -34,6 +50,7 @@ class FallingPianoActivity : AppCompatActivity() {
     private val backing=mutableMapOf<Int,Int>()
     private val accompanied=mutableSetOf<Int>()
     private lateinit var score: List<PianoLesson.Note>
+    private var demoReleases: Array<DemoNoteRelease>? = null
     private lateinit var lesson: PianoLesson
     private lateinit var seekBar: SeekBar
     private lateinit var loopButton: Button
@@ -44,12 +61,56 @@ class FallingPianoActivity : AppCompatActivity() {
     private val pianoSong get()=intent.getStringExtra("piano_song") ?: "autumn"
     private val isPhotoSheet get()=pianoSong=="autumn_photo"
     private val isCoMaySynthesia get()=pianoSong=="co_may_synthesia"
+    private val isAutumnCoMayMix get() = pianoSong == AUTUMN_CO_MAY_MIX_SONG_ID
+    private val isAutumnJeanie get() = pianoSong == AUTUMN_JEANIE_SONG_ID
+    private val isMoonRepresentsMyHeart get() = pianoSong == MOON_REPRESENTS_MY_HEART_SONG_ID
+    private val sharedAttacks by lazy {
+        if (isAutumnJeanie) score.groupBy { it.start to it.midi }.filterValues { it.size > 1 }
+        else emptyMap()
+    }
+    private val twoHandScore by lazy {
+        // The unison in measure 19 uses one key. Keep its longer written duration.
+        if (sharedAttacks.isEmpty()) score else score.filter { note ->
+            val shared = sharedAttacks[note.start to note.midi]
+            shared == null || note === shared.maxBy { it.end }
+        }
+    }
+    private val practiceScore get() =
+        if (demonstration || hand == 2) twoHandScore else score.filter { it.hand == hand }
+    private val playbackScore get() = if (demonstration) twoHandScore else score
     private val isCoMayChorus1 get()=pianoSong=="co_may_chorus1_tutorial"
     private val isEasyAutumn get()=pianoSong=="autumn_easy"
+    private val isInstantEternity get() = pianoSong == INSTANT_ETERNITY_SONG_ID
     private val isNoiNay by lazy { pianoSong=="noi_nay" || pianoSong=="noi_nay_advanced" }
     private val isAdvanced by lazy { pianoSong=="noi_nay_advanced" }
-    private val songTitle get()=when(pianoSong) { "co_may_synthesia" -> "Lãng Quên Chiều Thu • Synthesia cô Mây"; "autumn_photo" -> "Lãng Quên Chiều Thu • Bản cô Mây • 75 BPM luyện tập"; "autumn_easy" -> "Lãng Quên Chiều Thu • Bản dễ • Tay trái đơn giản"; "noi_nay_advanced" -> "Nơi này có anh • Advanced • Jason Srey • 92 BPM"; "noi_nay" -> "Nơi này có anh • Bản dễ • 75 BPM"; else -> "Lãng Quên Chiều Thu • Bản nâng cao" }
-    private val practicePreferences by lazy { getSharedPreferences(when(pianoSong) { "co_may_synthesia" -> "co_may_synthesia_piano_practice"; "autumn_photo" -> "autumn_photo_piano_practice"; "noi_nay_advanced" -> "noi_nay_advanced_piano_practice"; "noi_nay" -> "noi_nay_piano_practice"; else -> "autumn_piano_practice" }, MODE_PRIVATE) }
+    private val songTitle get() = when (pianoSong) {
+        AUTUMN_CO_MAY_MIX_SONG_ID -> getString(R.string.autumn_co_may_mix_title)
+        AUTUMN_JEANIE_SONG_ID -> getString(R.string.autumn_jeanie_title)
+        MOON_REPRESENTS_MY_HEART_SONG_ID -> getString(R.string.moon_represents_my_heart_title)
+        INSTANT_ETERNITY_SONG_ID -> getString(R.string.instant_eternity_title)
+        INSTANT_ETERNITY_EASY_SONG_ID -> getString(R.string.instant_eternity_easy_title)
+        "co_may_synthesia" -> "Lãng Quên Chiều Thu • Synthesia cô Mây"
+        "autumn_photo" -> "Lãng Quên Chiều Thu • Bản cô Mây • 75 BPM luyện tập"
+        "autumn_easy" -> "Lãng Quên Chiều Thu • Bản dễ • Tay trái đơn giản"
+        "noi_nay_advanced" -> "Nơi này có anh • Advanced • Jason Srey • 92 BPM"
+        "noi_nay" -> "Nơi này có anh • Bản dễ • 75 BPM"
+        else -> "Lãng Quên Chiều Thu • Bản nâng cao"
+    }
+    private val practicePreferences by lazy {
+        val name = when (pianoSong) {
+            AUTUMN_CO_MAY_MIX_SONG_ID -> "autumn_co_may_mix_piano_practice"
+            AUTUMN_JEANIE_SONG_ID -> "autumn_jeanie_piano_practice"
+            MOON_REPRESENTS_MY_HEART_SONG_ID -> "moon_represents_my_heart_piano_practice"
+            INSTANT_ETERNITY_SONG_ID -> "instant_eternity_piano_practice"
+            INSTANT_ETERNITY_EASY_SONG_ID -> "instant_eternity_easy_piano_practice"
+            "co_may_synthesia" -> "co_may_synthesia_piano_practice"
+            "autumn_photo" -> "autumn_photo_piano_practice"
+            "noi_nay_advanced" -> "noi_nay_advanced_piano_practice"
+            "noi_nay" -> "noi_nay_piano_practice"
+            else -> "autumn_piano_practice"
+        }
+        getSharedPreferences(name, MODE_PRIVATE)
+    }
     private var pointA=0.0
     private var pointB=0.0
     private var looping=false
@@ -69,24 +130,62 @@ class FallingPianoActivity : AppCompatActivity() {
     private var ready=false
     private var sustain=false
     private var lastFrame=0L
+    private val midiMetrics by lazy {
+        if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) MidiMetrics() else null
+    }
+    private var midiArrival: MidiArrival? = null
+    private var midiDispatchAt = 0L
     private var feedback="Nhấn Bắt đầu • Xanh: tay phải • Cam: tay trái"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val json=JSONArray(assets.open(when(pianoSong) { "co_may_chorus1_tutorial" -> "co_may_chorus1_tutorial_notes.json"; "co_may_synthesia" -> "co_may_synthesia_notes.json"; "autumn_photo" -> "autumn_photo_notes.json"; "autumn_easy" -> "autumn_easy_notes.json"; "noi_nay_advanced" -> "noi_nay_advanced_notes.json"; "noi_nay" -> "noi_nay_notes.json"; else -> "autumn_notes.json" }).bufferedReader().use { it.readText() })
+        val notesFile = when (pianoSong) {
+            AUTUMN_CO_MAY_MIX_SONG_ID -> "autumn_co_may_mix_notes.json"
+            AUTUMN_JEANIE_SONG_ID -> "autumn_jeanie_notes.json"
+            MOON_REPRESENTS_MY_HEART_SONG_ID -> "moon_represents_my_heart_notes.json"
+            INSTANT_ETERNITY_SONG_ID -> "instant_eternity_notes.json"
+            INSTANT_ETERNITY_EASY_SONG_ID -> "instant_eternity_easy_notes.json"
+            "co_may_chorus1_tutorial" -> "co_may_chorus1_tutorial_notes.json"
+            "co_may_synthesia" -> "co_may_synthesia_notes.json"
+            "autumn_photo" -> "autumn_photo_notes.json"
+            "autumn_easy" -> "autumn_easy_notes.json"
+            "noi_nay_advanced" -> "noi_nay_advanced_notes.json"
+            "noi_nay" -> "noi_nay_notes.json"
+            else -> "autumn_notes.json"
+        }
+        val json = JSONArray(assets.open(notesFile).bufferedReader().use { it.readText() })
         score=(0 until json.length()).map { i -> json.getJSONObject(i).let {
             val pose=it.optJSONArray("pose")
             PianoLesson.Note(it.getInt("midi"),it.getDouble("start"),it.getDouble("end"),it.getInt("hand"),
                 it.optInt("finger",0), if(pose==null) emptyList() else (0 until pose.length()).map { i -> pose.getInt(i) })
         }}.sortedBy { it.start }
-        duration=score.maxOf { it.end } + 500
+        if (isCoMaySynthesia) demoReleases = connectedDemoReleases(score)
+        val timelineFile = when (pianoSong) {
+            AUTUMN_CO_MAY_MIX_SONG_ID -> "autumn_co_may_mix_timeline.json"
+            AUTUMN_JEANIE_SONG_ID -> "autumn_jeanie_timeline.json"
+            MOON_REPRESENTS_MY_HEART_SONG_ID -> "moon_represents_my_heart_timeline.json"
+            INSTANT_ETERNITY_SONG_ID -> "instant_eternity_timeline.json"
+            INSTANT_ETERNITY_EASY_SONG_ID -> "instant_eternity_easy_timeline.json"
+            "co_may_chorus1_tutorial" -> "co_may_chorus1_tutorial_timeline.json"
+            "co_may_synthesia" -> "co_may_synthesia_timeline.json"
+            "autumn_photo" -> "autumn_photo_timeline.json"
+            "noi_nay_advanced" -> "noi_nay_advanced_timeline.json"
+            "noi_nay" -> "noi_nay_timeline.json"
+            else -> "lang_quen_chieu_thu_timeline.json"
+        }
+        val timeline = JSONArray(assets.open(timelineFile).bufferedReader().use { it.readText() })
+        val durationWithRelease = score.maxOf { it.end } + 500
+        duration = if (isAutumnJeanie || isMoonRepresentsMyHeart) {
+            maxOf(durationWithRelease, timeline.getJSONObject(timeline.length() - 1).getDouble("endMs"))
+        } else {
+            durationWithRelease
+        }
         val savedA=practicePreferences.getLong("loop_start_ms",0L).toDouble()
         val savedB=practicePreferences.getLong("loop_end_ms",duration.toLong()).toDouble()
         val validRange=savedA>=0 && savedA<savedB && savedB<=duration
         pointA=if(validRange) savedA else 0.0
         pointB=if(validRange) savedB else duration
         looping=validRange && practicePreferences.getBoolean("loop_enabled",false)
-        val timeline=JSONArray(assets.open(when(pianoSong) { "co_may_chorus1_tutorial" -> "co_may_chorus1_tutorial_timeline.json"; "co_may_synthesia" -> "co_may_synthesia_timeline.json"; "autumn_photo" -> "autumn_photo_timeline.json"; "noi_nay_advanced" -> "noi_nay_advanced_timeline.json"; "noi_nay" -> "noi_nay_timeline.json"; else -> "lang_quen_chieu_thu_timeline.json" }).bufferedReader().use { it.readText() })
         bars=(0 until timeline.length()).map { timeline.getJSONObject(it).let { row -> row.getInt("bar") to row.getDouble("startMs") } }
         sectionNames=(0 until timeline.length()).mapNotNull { i ->
             timeline.getJSONObject(i).let { row ->
@@ -111,13 +210,26 @@ class FallingPianoActivity : AppCompatActivity() {
         play.isEnabled=false
         button("Chơi lại") { reset() }
         controlPanel.addView(controls)
-        if(isNoiNay || isPhotoSheet) controlPanel.addView(TextView(this).apply {
+        if(isNoiNay || isPhotoSheet || isInstantEternity || isAutumnJeanie || isMoonRepresentsMyHeart) controlPanel.addView(TextView(this).apply {
             text="$songTitle • Chạm để xem sheet" + if(isPhotoSheet) "\nTay trái rải theo hướng dẫn cô Mây • Nhịp luyện tập đều" else ""
             setTextColor(Color.LTGRAY); textSize=12f
             setOnClickListener {
-                if(isPhotoSheet) startActivity(android.content.Intent(this@FallingPianoActivity, AutumnPhotoSheetActivity::class.java))
-                else openNoiNaySheet()
+                when {
+                    isPhotoSheet -> startActivity(Intent(this@FallingPianoActivity, AutumnPhotoSheetActivity::class.java))
+                    isInstantEternity -> openInstantEternitySheet()
+                    isAutumnJeanie -> openSheetInBrowser(AUTUMN_JEANIE_SHEET_URL, R.string.autumn_jeanie_no_browser)
+                    isMoonRepresentsMyHeart -> openSheetInBrowser(
+                        MOON_REPRESENTS_MY_HEART_SHEET_URL,
+                        R.string.moon_represents_my_heart_no_browser,
+                    )
+                    else -> openNoiNaySheet()
+                }
             }
+        })
+        if (isAutumnCoMayMix || pianoSong == INSTANT_ETERNITY_EASY_SONG_ID) controlPanel.addView(TextView(this).apply {
+            text = songTitle
+            setTextColor(Color.LTGRAY)
+            textSize = 12f
         })
         if(isCoMaySynthesia) controlPanel.addView(TextView(this).apply {
             text="$songTitle\nDạo đầu • Hai lượt verse / điệp khúc • Kết mở rộng"
@@ -265,7 +377,9 @@ class FallingPianoActivity : AppCompatActivity() {
         root.addView(roll,LinearLayout.LayoutParams(-1,0,1f))
         setContentView(root)
         pool=SoundPool.Builder().setMaxStreams(32).setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()).build()
-        val sampleRange=if(isCoMaySynthesia) minOf(28,score.minOf { it.midi })..maxOf(93,score.maxOf { it.midi }) else 28..93
+        val sampleRange = if (isCoMaySynthesia || isInstantEternity || isAutumnCoMayMix) {
+            minOf(28, score.minOf { it.midi })..maxOf(93, score.maxOf { it.midi })
+        } else 28..93
         var loaded=0
         var failed=false
         pool.setOnLoadCompleteListener { _,_,result ->
@@ -291,11 +405,20 @@ class FallingPianoActivity : AppCompatActivity() {
                 midiHeld.add(midi)
                 roll.externalHeldNotes=midiHeld.toSet()
                 if(!demonstration) {
+                    var audioRequestedAt: Long? = null
                     if(midiEcho && ready) {
                         midiStreams.remove(midi)?.let { fadeOut(it) }
                         midiStreams[midi]=playSoft(midi,playerVolume(midi)*velocity/127f,1)
+                        if (midiMetrics != null) audioRequestedAt = System.nanoTime()
                     }
-                    feedback=if(running && countdown<=0) lesson.press(midi) else "Đã nhận phím MIDI $midi • Bấm Bắt đầu để học"
+                    val scoring = running && countdown <= 0
+                    feedback = if (scoring) lesson.press(midi) else "Đã nhận phím MIDI $midi • Bấm Bắt đầu để học"
+                    midiArrival?.let { arrival ->
+                        midiMetrics?.record(
+                            arrival, midiDispatchAt, audioRequestedAt,
+                            if (scoring) System.nanoTime() else null,
+                        )?.let { Log.d("PianoMidiTiming", it) }
+                    }
                     updateStatus()
                     if(!running || countdown>0) midiStatus.text="Đã nhận phím MIDI $midi • Vận tốc $velocity"
                 }
@@ -312,8 +435,21 @@ class FallingPianoActivity : AppCompatActivity() {
         )
         midiInput=PianoMidiInput(this,
             onStatus={ message, connected -> midiStatus.text=message; midiStatus.setTextColor(if(connected) Color.rgb(81,191,127) else Color.LTGRAY) },
-            onMessage={ message, data, value -> midiState.message(message,data,value) },
-            onDisconnected={ pause() }
+            onMessage={ message, data, value, arrival ->
+                if (midiMetrics != null) {
+                    midiArrival = arrival
+                    midiDispatchAt = System.nanoTime()
+                }
+                try {
+                    midiState.message(message, data, value)
+                } finally {
+                    midiArrival = null
+                }
+            },
+            onDisconnected={
+                midiMetrics?.drain()?.let { Log.d("PianoMidiTiming", it) }
+                pause()
+            }
         )
     }
     private val Int.dp get()=(this*resources.displayMetrics.density).toInt()
@@ -333,16 +469,28 @@ class FallingPianoActivity : AppCompatActivity() {
         envelopes.postAtTime({ voiceVolumes.remove(stream) },stream,SystemClock.uptimeMillis()+6200)
         return stream
     }
-    private fun fadeOut(stream:Int) {
-        val initial=voiceVolumes[stream] ?: return
+    private fun fadeOut(stream: Int, durationMs: Long = DEFAULT_NOTE_FADE_MS) {
+        val initial = voiceVolumes[stream] ?: return
         envelopes.removeCallbacksAndMessages(stream)
-        val start=SystemClock.uptimeMillis()
-        for(step in 1..10) envelopes.postAtTime({
-            val remaining=1f-step/10f
-            val volume=initial*remaining*remaining
-            pool.setVolume(stream,volume,volume)
-            if(step==10) { pool.stop(stream); voiceVolumes.remove(stream) }
-        },stream,start+step*20L)
+        if (durationMs <= 0L) {
+            pool.stop(stream)
+            voiceVolumes.remove(stream)
+            return
+        }
+        val start = SystemClock.uptimeMillis()
+        val steps = ((durationMs + NOTE_FADE_STEP_MS - 1) / NOTE_FADE_STEP_MS).toInt()
+        for (step in 1..steps) {
+            val elapsedMs = minOf(step * NOTE_FADE_STEP_MS, durationMs)
+            envelopes.postAtTime({
+                val remaining = 1f - elapsedMs.toFloat() / durationMs
+                val volume = initial * remaining * remaining
+                pool.setVolume(stream, volume, volume)
+                if (step == steps) {
+                    pool.stop(stream)
+                    voiceVolumes.remove(stream)
+                }
+            }, stream, start + elapsedMs)
+        }
     }
     /** Rebuild the selected part without rewinding the transport or changing A–B. */
     private fun changeSettings() {
@@ -351,7 +499,7 @@ class FallingPianoActivity : AppCompatActivity() {
         val wasStarted=started
         val remainingCountdown=countdown
         pause()
-        lesson=PianoLesson(score.filter { demonstration || hand==2 || it.hand==hand },waitMode,speed,demonstration,retryChordOnMistake)
+        lesson=PianoLesson(practiceScore,waitMode,speed,demonstration,retryChordOnMistake)
         roll.lesson=lesson
         roll.configure(lesson.notes)
         seekTo(position,false)
@@ -368,7 +516,7 @@ class FallingPianoActivity : AppCompatActivity() {
     private fun reset() {
         pause()
         accompanied.clear()
-        lesson=PianoLesson(score.filter { demonstration || hand==2 || it.hand==hand },waitMode,speed,demonstration,retryChordOnMistake)
+        lesson=PianoLesson(practiceScore,waitMode,speed,demonstration,retryChordOnMistake)
         roll.lesson=lesson; roll.configure(lesson.notes)
         feedback="${if(waitMode) "Đánh phím sáng để tiếp tục" else "Đánh khi nốt chạm vạch vàng"} • Giữ theo độ dài thanh"
         seekTo(if(looping) pointA else 0.0,false)
@@ -376,8 +524,16 @@ class FallingPianoActivity : AppCompatActivity() {
     private fun currentBar() = bars.indexOfLast { it.second<=lesson.position.coerceAtLeast(0.0) }.coerceAtLeast(0)
     private fun time(ms:Double):String { val sec=ms.toInt()/1000; return "%d:%02d".format(sec/60,sec%60) }
     private fun updateMarkers() {
-        val location=if(isCoMaySynthesia) "Đoạn ${currentBar()+1}/${bars.size} • ${sectionNames[bars[currentBar()].first].orEmpty()}" else "Ô ${bars[currentBar()].first} (lượt ${currentBar()+1}/${bars.size})"
-        val endLabel=if(isCoMaySynthesia) "B: hết đoạn đang chọn" else "B: hết ô đang chọn"
+        val markerIndex = currentBar()
+        val markerNumber = bars[markerIndex].first
+        val label = sectionNames[markerNumber]
+        val isMixPickup = isAutumnCoMayMix && !label.isNullOrBlank()
+        val location = when {
+            isCoMaySynthesia -> "Đoạn ${markerIndex + 1}/${bars.size} • ${label.orEmpty()}"
+            isMixPickup -> label.orEmpty()
+            else -> "Ô $markerNumber (lượt ${markerIndex + 1}/${bars.size})"
+        }
+        val endLabel = if (isCoMaySynthesia || isMixPickup) "B: hết đoạn đang chọn" else "B: hết ô đang chọn"
         markers.text="${time(lesson.position.coerceAtLeast(0.0))} / ${time(duration)} • $location • A ${time(pointA)} – B ${time(pointB)} • $endLabel"
     }
     private fun seekTo(target:Double, resume:Boolean) {
@@ -385,7 +541,7 @@ class FallingPianoActivity : AppCompatActivity() {
         val start=if(looping) target.coerceIn(pointA,pointB-1) else target.coerceIn(0.0,duration-1)
         lesson.seek(start,if(looping) pointB else duration)
         accompanied.clear()
-        score.forEachIndexed { i,n -> if(n.start<start) accompanied.add(i) }
+        playbackScore.forEachIndexed { i,n -> if(n.start<start) accompanied.add(i) }
         countdown=3000.0
         started=false
         roll.invalidate(); updateStatus()
@@ -457,14 +613,31 @@ class FallingPianoActivity : AppCompatActivity() {
                     streams[midi]=playSoft(midi, playerVolume(midi), 1)
                 }
             }
-            if(demonstration || hand!=2) score.forEachIndexed { i,n ->
+            val playbackNotes = playbackScore
+            if(demonstration || hand!=2) playbackNotes.forEachIndexed { i,n ->
                 if((demonstration || n.hand!=hand) && n.start<lesson.rangeEnd && n.start<=lesson.position && i !in accompanied) {
                     accompanied.add(i)
+                    if (!demonstration && sharedAttacks.isNotEmpty() && (n.start to n.midi) in sharedAttacks) {
+                        return@forEachIndexed
+                    }
                     // Demo includes dense chords: reserve mix headroom after sample normalization.
                     if(n.end>lesson.position) run { backing[i]=playSoft(n.midi, if(demonstration) { if(n.hand==0) .45f else .325f } else .35f, 0) }
                 }
             }
-            backing.keys.toList().filter { score[it].end<=lesson.position }.forEach { backing.remove(it)?.let { stream -> fadeOut(stream) } }
+            val releases = if (demonstration) demoReleases else null
+            backing.keys.filter { index ->
+                (releases?.get(index)?.startMs ?: playbackNotes[index].end) <= lesson.position
+            }.forEach { index ->
+                backing.remove(index)?.let { stream ->
+                    val release = releases?.get(index)
+                    val tailMs = release?.durationMs ?: DEFAULT_NOTE_FADE_MS
+                    val nextAttack = release?.stopBeforeMs
+                    val fadeMs = if (nextAttack == null) tailMs else {
+                        minOf(tailMs, ((nextAttack - lesson.position) / speed).toLong())
+                    }
+                    fadeOut(stream, fadeMs)
+                }
+            }
             roll.invalidate(); updateStatus()
             if(lesson.finished && looping) { seekTo(pointA,true); return }
             if(lesson.finished) { pause(); feedback="Hoàn thành • Nhấn Chơi lại để luyện tiếp"; updateStatus() }
@@ -491,7 +664,72 @@ class FallingPianoActivity : AppCompatActivity() {
             Toast.makeText(this,"Cần ứng dụng đọc PDF để mở sheet",Toast.LENGTH_LONG).show()
         }
     }
+    private fun openInstantEternitySheet() {
+        openSheetInBrowser("https://www.qinpu123.com/qiyue/gangqin/580794.html", R.string.instant_eternity_no_browser)
+    }
+    private fun openSheetInBrowser(url: String, noBrowserMessage: Int) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, noBrowserMessage, Toast.LENGTH_LONG).show()
+        }
+    }
     override fun onStart() { super.onStart(); if(::midiInput.isInitialized) midiInput.start() }
     override fun onStop() { if(::midiInput.isInitialized) midiInput.stop(); pause(); saveLoop(); super.onStop() }
     override fun onDestroy() { if(::midiInput.isInitialized) midiInput.close(); pool.release(); super.onDestroy() }
+}
+
+private const val NOTE_FADE_STEP_MS = 20L
+private const val DEFAULT_NOTE_FADE_MS = 200L
+private const val SOFT_DEMO_NOTE_FADE_MS = 480L
+private const val MAX_DEMO_NOTE_GAP_MS = 240.0
+private const val MAX_DEMO_NOTE_EXTENSION_MS = 220.0
+private const val MAX_DEMO_NOTE_OVERLAP_MS = 90.0
+private const val SHORT_DEMO_NOTE_HOLD_MS = 280.0
+private const val DEMO_REPEAT_FADE_WINDOW_MS = 80.0
+
+private data class DemoNoteRelease(
+    val startMs: Double,
+    val durationMs: Long,
+    val stopBeforeMs: Double? = null,
+)
+
+private fun connectedDemoReleases(notes: List<PianoLesson.Note>): Array<DemoNoteRelease> {
+    val releases = Array(notes.size) { DemoNoteRelease(notes[it].end, DEFAULT_NOTE_FADE_MS) }
+    val nextPitchStarts = DoubleArray(notes.size)
+    val pitchStarts = mutableMapOf<Int, Double>()
+    for (index in notes.indices.reversed()) {
+        val note = notes[index]
+        nextPitchStarts[index] = pitchStarts.put(note.midi, note.start) ?: Double.POSITIVE_INFINITY
+    }
+    for (handNotes in notes.indices.groupBy { notes[it].hand }.values) {
+        val attacks = handNotes.groupBy { notes[it].start }.values.toList()
+        for ((attackIndex, current) in attacks.withIndex()) {
+            val next = attacks.getOrNull(attackIndex + 1).orEmpty()
+            val nextStart = next.firstOrNull()?.let { notes[it].start } ?: Double.POSITIVE_INFINITY
+            for (index in current) {
+                val note = notes[index]
+                val gap = nextStart - note.end
+                val connected = gap in -MAX_DEMO_NOTE_OVERLAP_MS..MAX_DEMO_NOTE_GAP_MS &&
+                    next.none { notes[it].midi == note.midi }
+                val short = note.end - note.start <= SHORT_DEMO_NOTE_HOLD_MS
+                if (!short && !connected) continue
+
+                val desiredEnd = if (connected) nextStart else minOf(nextStart, note.start + SHORT_DEMO_NOTE_HOLD_MS)
+                val nextPitchStart = nextPitchStarts[index]
+                // Leave time for the old tail to fade before the same key is played again.
+                val latestReleaseStart = minOf(
+                    desiredEnd,
+                    note.end + MAX_DEMO_NOTE_EXTENSION_MS,
+                    nextPitchStart - DEMO_REPEAT_FADE_WINDOW_MS,
+                )
+                releases[index] = DemoNoteRelease(
+                    maxOf(note.end, latestReleaseStart),
+                    SOFT_DEMO_NOTE_FADE_MS,
+                    nextPitchStart.takeIf { it.isFinite() },
+                )
+            }
+        }
+    }
+    return releases
 }
